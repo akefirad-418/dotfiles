@@ -1,0 +1,6 @@
+{
+  "//": "chezmoi modify_ scripts are shell, but their source name must keep the target's .json extension (modify_private_auth.json -> ~/.../auth.json). Tell the editor they're shell, not JSON.",
+  "files.associations": {
+    "**/modify_*.json": "shellscript"
+  }
+}

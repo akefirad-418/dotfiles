@@ -1,0 +1,10 @@
+*~
+
+.DS_Store
+
+.env.local
+
+# Claude
+**/CLAUDE.local.md
+**/.claude/settings.local.json
+**/.claude/local

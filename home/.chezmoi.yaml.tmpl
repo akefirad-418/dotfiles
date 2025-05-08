@@ -1,0 +1,125 @@
+{{- /*
+  chezmoi config template -> ~/.config/chezmoi/chezmoi.yaml (written at `init`).
+
+  Switches are resolved ONCE here and baked into the generated config; `apply`/
+  `update` read the baked file, so values are stable across re-applies. Only a
+  re-`init` re-resolves. Precedence for each switch:
+      previously-persisted value (this config)  >  outside env (first init)  >  default
+  i.e. set once at provisioning, stable thereafter. Persisted-FIRST is deliberate:
+  scriptEnv below re-injects these same names into the process env when chezmoi
+  runs, so on re-init `env "CLAWBOT"` returns the persisted value, not a fresh one
+  — reading the raw env couldn't override it anyway. To CHANGE an INSTALL_* switch,
+  re-run install.sh (it reconciles env/prompt and clears the run-state cache so the
+  installer re-fires); for the others, set the key in ~/.config/chezmoi/chezmoi.yaml
+  (or delete the whole file) and re-run `chezmoi init`.
+
+  Delivered: `data` (templates: ignore/externals), `scriptEnv` (run_ scripts read
+  $CLAWBOT/$INSTALL_*), and dot_config/shell/clawbot.env.tmpl (login shells see
+  the resolved flag).
+
+  GUI is the exception — a live property of the machine (is a display attached
+  now?), so it is NOT baked here. It's detected at runtime by env.sh (shells) and
+  by the gui-gated scripts, re-evaluated on every apply. Override a run with
+  `GUI=0|1 chezmoi apply`.
+*/ -}}
+{{- /* .clawbot: boolean flag — "1" on an agent box, "" otherwise. It is NOT an
+       identity; the value carries no hostname/name (clawpatrol keys its device
+       identity on the runtime hostname, not this). Any non-empty CLAWBOT means
+       "yes". Kept as "1"/"" (not a YAML bool) so the `[ -n ]`/`[ -z ]` script
+       checks and `if .clawbot` template checks all keep working. */ -}}
+{{- $clawbot := dig "clawbot" "" . -}}
+{{- if eq $clawbot "" -}}
+{{-   if ne (env "CLAWBOT") "" }}{{ $clawbot = "1" }}{{ end -}}
+{{- end -}}
+{{- /* INSTALL_* toggles: "1"/"0" strings (scripts hard-compare these; see scriptEnv
+       and the run_onchange installers). Resolved once at init by promptStringOnce:
+       returns the already-persisted value if set, else prompts (interactive) or
+       returns the default (non-interactive — CI/Docker, never hangs). The default
+       chains env → clawbot-aware: a lean agent box installs neither Claude Code nor opencode, a
+       human box installs both. Hermes is OFF by default on every box; opt in.
+       (CLAWBOT itself is not prompted — it sets these defaults.) A default is always
+       passed: a no-default prompt silently returns empty when non-interactive. */ -}}
+{{- $ccDefault := env "INSTALL_CLAUDE_CODE" -}}
+{{- if eq $ccDefault "" }}{{ $ccDefault = (ternary "0" "1" (ne $clawbot "")) }}{{ end -}}
+{{- $installClaudeCode := promptStringOnce . "install.claudeCode" "Install Claude Code? (1/0)" $ccDefault -}}
+{{- $ocDefault := env "INSTALL_OPENCODE" -}}
+{{- if eq $ocDefault "" }}{{ $ocDefault = (ternary "0" "1" (ne $clawbot "")) }}{{ end -}}
+{{- $installOpencode := promptStringOnce . "install.opencode" "Install opencode? (1/0)" $ocDefault -}}
+{{- $hmDefault := env "INSTALL_HERMES" -}}
+{{- if eq $hmDefault "" }}{{ $hmDefault = "0" }}{{ end -}}
+{{- $installHermes := promptStringOnce . "install.hermes" "Install Hermes? (1/0)" $hmDefault -}}
+{{- /* No seed switch: a clawbot is BY DEFINITION behind the clawpatrol gateway, so it
+       always gets FAKE placeholder credentials (the gateway swaps them for the real
+       secret at the wire). The seeder scripts therefore gate on $CLAWBOT (already in
+       scriptEnv) AND the per-tool $INSTALL_* flag — so each tool is seeded only where
+       it's installed, and a human box (not a clawbot) is never seeded. */ -}}
+
+{{- /*
+  Identity prompts: chezmoi-direct users (no install.sh) get prompted with these
+  defaults; install.sh pre-populates them from the repo so its users see real
+  values. Agents default to a generic agent identity.
+
+  archiveName* below map chezmoi.os ("linux"/"darwin") + chezmoi.arch
+  ("amd64"/"arm64") to each upstream's release-asset naming convention.
+*/ -}}
+{{- $nameDefault := "Anonymous" -}}
+{{- $emailDefault := "anonymous@localhost" -}}
+{{- if $clawbot }}{{ $nameDefault = "agent" }}{{ $emailDefault = "agent@localhost" }}{{ end -}}
+{{- $gitName  := promptStringOnce . "git.name"  "Git user.name"  $nameDefault  -}}
+{{- $gitEmail := promptStringOnce . "git.email" "Git user.email" $emailDefault -}}
+{{- $p10kRepo := promptStringOnce . "p10k.repo" "Powerlevel10k repo URL" "https://github.com/romkatv/powerlevel10k.git" -}}
+{{- $rustArch := "x86_64" -}}
+{{- if eq .chezmoi.arch "arm64" }}{{ $rustArch = "aarch64" }}{{ end -}}
+
+sourceDir: ~/.dotfiles
+
+data:
+  clawbot: {{ $clawbot | quote }}
+  install:
+    claudeCode: {{ $installClaudeCode | quote }}
+    opencode: {{ $installOpencode | quote }}
+    hermes: {{ $installHermes | quote }}
+  git:
+    name:  {{ $gitName  | quote }}
+    email: {{ $gitEmail | quote }}
+  p10k:
+    repo: {{ $p10kRepo | quote }}
+  # GoReleaser-style: <Capitalized OS>_<x86_64|arm64>
+  archiveNameAct: {{ if eq .chezmoi.os "darwin" }}Darwin{{ else }}Linux{{ end }}_{{ if eq .chezmoi.arch "amd64" }}x86_64{{ else }}{{ .chezmoi.arch }}{{ end }}
+
+  # Rust target triples. The linux distribution flavor (gnu vs musl) is
+  # chosen per project based on which the upstream actually ships:
+  # - bat, fd, uv: both arches ship `unknown-linux-gnu`.
+  # - sd, zoxide: both arches ship `unknown-linux-musl`.
+  # - ripgrep: arm64 ships `gnu`, x86_64 ships `musl` (no x86_64 gnu build).
+  archiveNameBat: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-gnu{{ end }}
+  archiveNameFd: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-gnu{{ end }}
+  archiveNameRipgrep: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else if eq .chezmoi.arch "amd64" }}unknown-linux-musl{{ else }}unknown-linux-gnu{{ end }}
+  archiveNameSd: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-musl{{ end }}
+  archiveNameUv: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-gnu{{ end }}
+  # btop, eza: linux-only tier-1 (no macOS binary; macOS uses brew). btop ships musl, eza gnu.
+  archiveNameBtop: {{ $rustArch }}-unknown-linux-musl
+  archiveNameEza: {{ $rustArch }}-unknown-linux-gnu
+  archiveNameZoxide: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-musl{{ end }}
+  archiveNameGh: {{ if eq .chezmoi.os "darwin" }}macOS{{ else }}{{ .chezmoi.os }}{{ end }}_{{ .chezmoi.arch }}
+  archiveNameJq: {{ if eq .chezmoi.os "darwin" }}macos{{ else }}linux{{ end }}-{{ .chezmoi.arch }}
+  # yq ships raw per-os/arch binaries named yq_<os>_<arch>; os/arch match chezmoi's.
+  archiveNameYq: {{ .chezmoi.os }}_{{ .chezmoi.arch }}
+  archiveNameK6: {{ if eq .chezmoi.os "darwin" }}macos{{ else }}{{ .chezmoi.os }}{{ end }}-{{ .chezmoi.arch }}
+  # k9s releases use the GoReleaser "<Capitalized OS>_<arch>" pattern.
+  archiveNameK9s: {{ if eq .chezmoi.os "darwin" }}Darwin{{ else }}Linux{{ end }}_{{ .chezmoi.arch }}
+  archiveNamePack: {{ if eq .chezmoi.os "darwin" }}macos{{ else }}{{ .chezmoi.os }}{{ end }}{{ if eq .chezmoi.arch "arm64" }}-arm64{{ end }}
+  # mise: bare binary mise-v<ver>-<os>-<arch>; os macos|linux, arch x64|arm64.
+  archiveNameMise: {{ if eq .chezmoi.os "darwin" }}macos{{ else }}linux{{ end }}-{{ if eq .chezmoi.arch "arm64" }}arm64{{ else }}x64{{ end }}
+  # bun: <os>-<x64|aarch64> zips; binary at <name>/bun. os darwin|linux.
+  archiveNameBun: {{ .chezmoi.os }}-{{ if eq .chezmoi.arch "arm64" }}aarch64{{ else }}x64{{ end }}
+
+scriptEnv:
+  CLAWBOT: {{ $clawbot | quote }}
+  INSTALL_CLAUDE_CODE: {{ $installClaudeCode | quote }}
+  INSTALL_OPENCODE: {{ $installOpencode | quote }}
+  INSTALL_HERMES: {{ $installHermes | quote }}
+  # Path (not a secret) to the private overlay's Hermes dotenv fragment. The Hermes
+  # after-script merges its KEY=VALUE lines into ~/.hermes/.env. Resolves to
+  # ~/.dotfiles/private/home/hermes/env; present only when the overlay is cloned.
+  PRIVATE_HERMES_ENV: {{ joinPath .chezmoi.sourceDir ".." "private" "home" "hermes" "env" | quote }}

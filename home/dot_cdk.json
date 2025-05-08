@@ -1,0 +1,7 @@
+{
+  "output": "out",
+  "context": {
+    "@aws-cdk/customresources:installLatestAwsSdkDefault": false,
+    "cli-telemetry": false
+  }
+}

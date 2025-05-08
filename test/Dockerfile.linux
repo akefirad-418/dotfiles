@@ -1,0 +1,38 @@
+# Ubuntu 24.04 test harness for the dotfiles install on Linux.
+# Built and driven by ../test/run.sh.
+
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    TZ=UTC
+
+# System packages the install scripts assume are present plus the bits a
+# realistic dev box would have (zsh, sudo, unzip, locales, gnupg, ca-certs).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential procps git file curl wget xz-utils unzip \
+        ca-certificates gnupg locales sudo zsh less \
+    && rm -rf /var/lib/apt/lists/* \
+    && locale-gen en_US.UTF-8
+
+# Non-root user with passwordless sudo so apt-get inside the install scripts
+# works without an interactive prompt.
+ARG USER=tester
+ARG UID=1001
+RUN useradd -m -u ${UID} -s /usr/bin/zsh ${USER} \
+    && echo "${USER} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/${USER} \
+    && chmod 0440 /etc/sudoers.d/${USER}
+
+USER ${USER}
+WORKDIR /home/${USER}
+
+# Copy the dotfiles repo in. .dockerignore keeps the host's caches/artifacts
+# out so the image stays clean.
+COPY --chown=${USER}:${USER} . /home/${USER}/.dotfiles
+
+ENV PATH="/home/${USER}/.local/bin:${PATH}"
+
+# Default entrypoint runs the installer. Override with `docker run ... bash`
+# for interactive debugging.
+CMD ["/home/tester/.dotfiles/install.sh"]

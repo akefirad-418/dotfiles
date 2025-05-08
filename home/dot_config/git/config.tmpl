@@ -1,0 +1,76 @@
+[user]
+    name = {{ .git.name }}
+    email = {{ .git.email }}
+
+[core]
+{{- if .clawbot }}
+    editor = vi
+    pager = cat
+{{- else }}
+    editor = nano
+    pager = delta
+{{- end }}
+    autocrlf = input
+    whitespace = -trailing-space
+
+[diff]
+    mnemonicPrefix = true
+    renames = true
+
+{{ if not .clawbot }}
+[interactive]
+    diffFilter = delta --color-only
+{{- end }}
+
+[alias]
+    a  = add
+    b   = branch
+    d   = diff
+    ds   = diff
+    l   = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    n   = checkout -b
+    o   = checkout
+    p   = push
+    s   = status
+    t   = commit
+    ap  = add -p
+    dc  = diff --cached  # Display the staged changes
+    aa  = add --all
+    lg  = log --graph --pretty='format:%C(red)%d%C(reset) %C(yellow)%h%C(reset) %ar %C(green)%aN%C(reset) %s'
+    pa  = pull --all
+    cid = "!echo $(git describe --always --abbrev=9)$([[ -z $(git status -s) ]] || echo -$(date +%s))"
+    head = describe --always --abbrev=9
+    undo = reset HEAD~1 --mixed
+    oops = commit --amend --no-edit
+    main = checkout main
+    # discard = "!git reset --hard && git clean -df"
+    discard = stash push --include-untracked -m 'Discarded changes'
+    rescue = !git fsck --full --no-reflogs --unreachable --lost-found | grep commit | cut -d\\  -f3 | xargs -n 1 git log -n 1 --name-status > .git/lost-found.txt
+
+[merge]
+    conflictstyle = zdiff3
+
+[pull]
+    ff = only
+
+[init]
+    defaultBranch = main
+
+[push]
+    autoSetupRemote = true
+{{ if not .clawbot }}
+[delta]
+    features = decorations
+
+[delta "interactive"]
+    keep-plus-minus-markers = false
+
+[delta "decorations"]
+    commit-decoration-style = blue ol
+    commit-style = raw
+    file-style = omit
+    hunk-header-decoration-style = blue box
+    hunk-header-file-style = red
+    hunk-header-line-number-style = "#067a00"
+    hunk-header-style = file line-number syntax
+{{- end }}

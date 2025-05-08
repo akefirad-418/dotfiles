@@ -1,0 +1,179 @@
+# Tier-1 tool downloads (release binaries straight into ~/.local/bin) + a few
+# git-repo checkouts. Versions/repos come from .chezmoidata.yaml; OS/arch asset
+# names from .chezmoi.yaml.tmpl (.archiveName*).
+#
+# Two groups:
+#   - ALWAYS: the lean set every machine needs.
+#   - {{ "{{ if not .clawbot }}" }}: personal extras + the zsh framework — skipped on clawbots.
+# checksums are still TODO across the board; downloads are trusted for now.
+
+# ── ALWAYS ────────────────────────────────────────────────────────────────────
+.local/bin/rg:
+  type: archive-file
+  url: {{ .tools.ripgrep.repo }}/releases/download/{{ .tools.ripgrep.version }}/ripgrep-{{ .tools.ripgrep.version }}-{{ .archiveNameRipgrep }}.tar.gz
+  executable: true
+  path: ripgrep-{{ .tools.ripgrep.version }}-{{ .archiveNameRipgrep }}/rg
+
+.local/bin/fd:
+  type: archive-file
+  url: {{ .tools.fd.repo }}/releases/download/v{{ .tools.fd.version }}/fd-v{{ .tools.fd.version }}-{{ .archiveNameFd }}.tar.gz
+  executable: true
+  path: fd-v{{ .tools.fd.version }}-{{ .archiveNameFd }}/fd
+
+.local/bin/jq:
+  type: file
+  url: {{ .tools.jq.repo }}/releases/download/{{ .tools.jq.version }}/jq-{{ .archiveNameJq }}
+  executable: true
+
+.local/bin/yq:
+  type: file
+  url: {{ .tools.yq.repo }}/releases/download/{{ .tools.yq.version }}/yq_{{ .archiveNameYq }}
+  executable: true
+
+.local/bin/gh:
+  type: archive-file
+  url: {{ .tools.gh.repo }}/releases/download/v{{ .tools.gh.version }}/gh_{{ .tools.gh.version }}_{{ .archiveNameGh }}.{{ if eq .chezmoi.os "darwin" }}zip{{ else }}tar.gz{{ end }}
+  executable: true
+  path: gh_{{ .tools.gh.version }}_{{ .archiveNameGh }}/bin/gh
+
+.local/bin/uv:
+  type: archive-file
+  url: {{ .tools.uv.repo }}/releases/download/{{ .tools.uv.version }}/uv-{{ .archiveNameUv }}.tar.gz
+  executable: true
+  path: uv-{{ .archiveNameUv }}/uv
+
+.local/bin/uvx:
+  type: archive-file
+  url: {{ .tools.uv.repo }}/releases/download/{{ .tools.uv.version }}/uv-{{ .archiveNameUv }}.tar.gz
+  executable: true
+  path: uv-{{ .archiveNameUv }}/uvx
+
+# mise (version manager; used for Node + Java/JVM). Bare binary — no archive.
+.local/bin/mise:
+  type: file
+  url: {{ .tools.mise.repo }}/releases/download/v{{ .tools.mise.version }}/mise-v{{ .tools.mise.version }}-{{ .archiveNameMise }}
+  executable: true
+
+.local/bin/kubectl-134:
+  type: file
+  url: {{ .tools.kubectl134.repo }}/release/v{{ .tools.kubectl134.version }}/bin/{{ .chezmoi.os }}/{{ .chezmoi.arch }}/kubectl
+  executable: true
+
+.local/bin/sd:
+  type: archive-file
+  url: {{ .tools.sd.repo }}/releases/download/v{{ .tools.sd.version }}/sd-v{{ .tools.sd.version }}-{{ .archiveNameSd }}.tar.gz
+  executable: true
+  path: sd-v{{ .tools.sd.version }}-{{ .archiveNameSd }}/sd
+
+.local/bin/terraform:
+  type: archive-file
+  url: https://releases.hashicorp.com/terraform/{{ .tools.terraform.version }}/terraform_{{ .tools.terraform.version }}_{{ .chezmoi.os }}_{{ .chezmoi.arch }}.zip
+  executable: true
+  path: terraform
+
+{{ if not .clawbot -}}
+# ── PERSONAL ONLY ─────────────────────────────────────────────────────────────
+
+# oh-my-zsh + prompt/plugins for the interactive zsh setup.
+.config/zsh/ohmyzsh:
+  type: git-repo
+  url: https://github.com/ohmyzsh/ohmyzsh.git
+  refreshPeriod: 168h
+
+.config/ohmyzsh/custom/themes/powerlevel10k:
+  type: git-repo
+  url: {{ .p10k.repo }}
+  refreshPeriod: 168h
+
+.config/ohmyzsh/custom/plugins/zsh-autosuggestions:
+  type: git-repo
+  url: https://github.com/zsh-users/zsh-autosuggestions.git
+  refreshPeriod: 168h
+
+.config/ohmyzsh/custom/plugins/fzf-tab:
+  type: git-repo
+  url: https://github.com/Aloxaf/fzf-tab.git
+  refreshPeriod: 168h
+
+.config/ohmyzsh/custom/plugins/kubetail:
+  type: git-repo
+  url: https://github.com/johanhaleby/kubetail.git
+  refreshPeriod: 168h
+
+.local/bin/act:
+  type: archive-file
+  url: {{ .tools.act.repo }}/releases/download/v{{ .tools.act.version }}/act_{{ .archiveNameAct }}.tar.gz
+  executable: true
+  path: act
+
+.local/bin/aws-sso:
+  type: file
+  url: {{ .tools.awsSso.repo }}/releases/download/v{{ .tools.awsSso.version }}/aws-sso-{{ .tools.awsSso.version }}-{{ .chezmoi.os }}-{{ .chezmoi.arch }}
+  executable: true
+
+.local/bin/bun:
+  type: archive-file
+  url: {{ .tools.bun.repo }}/releases/download/bun-v{{ .tools.bun.version }}/bun-{{ .archiveNameBun }}.zip
+  executable: true
+  path: bun-{{ .archiveNameBun }}/bun
+
+{{ if eq .chezmoi.os "linux" -}}
+.local/bin/btop:
+  type: archive-file
+  url: {{ .tools.btop.repo }}/releases/download/v{{ .tools.btop.version }}/btop-{{ .archiveNameBtop }}.tar.gz
+  executable: true
+  path: ./btop/bin/btop   # tar members have a leading ./ — chezmoi matches it literally
+
+.local/bin/eza:
+  type: archive-file
+  url: {{ .tools.eza.repo }}/releases/download/v{{ .tools.eza.version }}/eza_{{ .archiveNameEza }}.tar.gz
+  executable: true
+  path: ./eza
+{{ end }}
+.local/bin/bat:
+  type: archive-file
+  url: {{ .tools.bat.repo }}/releases/download/v{{ .tools.bat.version }}/bat-v{{ .tools.bat.version }}-{{ .archiveNameBat }}.tar.gz
+  executable: true
+  path: bat-v{{ .tools.bat.version }}-{{ .archiveNameBat }}/bat
+
+.local/bin/fx:
+  type: file
+  url: {{ .tools.fx.repo }}/releases/download/{{ .tools.fx.version }}/fx_{{ .chezmoi.os }}_{{ .chezmoi.arch }}
+  executable: true
+
+.local/bin/fzf:
+  type: archive-file
+  url: {{ .tools.fzf.repo }}/releases/download/v{{ .tools.fzf.version }}/fzf-{{ .tools.fzf.version }}-{{ .chezmoi.os }}_{{ .chezmoi.arch }}.tar.gz
+  executable: true
+  path: fzf
+
+.local/bin/gdu:
+  type: archive-file
+  url: {{ .tools.gdu.repo }}/releases/download/v{{ .tools.gdu.version }}/gdu_{{ .chezmoi.os }}_{{ .chezmoi.arch }}.tgz
+  executable: true
+  path: gdu_{{ .chezmoi.os }}_{{ .chezmoi.arch }}
+
+.local/bin/helm:
+  type: archive-file
+  url: https://get.helm.sh/helm-v{{ .tools.helm.version }}-{{ .chezmoi.os }}-{{ .chezmoi.arch }}.tar.gz
+  executable: true
+  path: {{ .chezmoi.os }}-{{ .chezmoi.arch }}/helm
+
+.local/bin/k6:
+  type: archive-file
+  url: {{ .tools.k6.repo }}/releases/download/v{{ .tools.k6.version }}/k6-v{{ .tools.k6.version }}-{{ .archiveNameK6 }}.{{ if eq .chezmoi.os "darwin" }}zip{{ else }}tar.gz{{ end }}
+  executable: true
+  path: k6-v{{ .tools.k6.version }}-{{ .archiveNameK6 }}/k6
+
+.local/bin/k9s:
+  type: archive-file
+  url: {{ .tools.k9s.repo }}/releases/download/v{{ .tools.k9s.version }}/k9s_{{ .archiveNameK9s }}.tar.gz
+  executable: true
+  path: k9s
+
+.local/bin/zoxide:
+  type: archive-file
+  url: {{ .tools.zoxide.repo }}/releases/download/v{{ .tools.zoxide.version }}/zoxide-{{ .tools.zoxide.version }}-{{ .archiveNameZoxide }}.tar.gz
+  executable: true
+  path: zoxide
+{{ end -}}

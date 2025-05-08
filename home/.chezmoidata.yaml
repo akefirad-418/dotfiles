@@ -1,0 +1,82 @@
+tools:
+  act:
+    repo: https://github.com/nektos/act
+    version: 0.2.89
+  awsSso:
+    repo: https://github.com/synfinatic/aws-sso-cli
+    version: 2.3.1
+  bat:
+    repo: https://github.com/sharkdp/bat
+    version: 0.26.1
+  btop:
+    repo: https://github.com/aristocratos/btop
+    version: 1.4.7           # linux-only tier-1 (no macOS release binary)
+  bun:
+    repo: https://github.com/oven-sh/bun
+    version: bun-v1.3.14     # tag is bun-v<ver>; zip holds <name>/bun
+  cloudflared:
+    repo: https://github.com/cloudflare/cloudflared
+    version: 2026.6.1
+  eza:
+    repo: https://github.com/eza-community/eza
+    version: 0.23.4          # linux-only tier-1 (no macOS release binary)
+  fd:
+    repo: https://github.com/sharkdp/fd
+    version: 10.4.2
+  fx:
+    repo: https://github.com/antonmedv/fx
+    version: 39.2.0
+  fzf:
+    repo: https://github.com/junegunn/fzf
+    version: 0.73.1
+  gdu:
+    repo: https://github.com/dundee/gdu
+    version: 5.36.1
+  gh:
+    repo: https://github.com/cli/cli
+    version: 2.95.0
+  helm:
+    repo: https://github.com/helm/helm
+    version: 4.2.2
+  jq:
+    repo: https://github.com/jqlang/jq
+    version: jq-1.8.2
+  k6:
+    repo: https://github.com/grafana/k6
+    version: 2.0.0
+  k9s:
+    repo: https://github.com/derailed/k9s
+    version: 0.51.0
+  kubectl133:
+    repo: https://dl.k8s.io
+    version: 1.33.0
+  kubectl134:
+    repo: https://dl.k8s.io
+    version: 1.34.8
+  kubectl136:
+    repo: https://dl.k8s.io
+    version: 1.36.1
+  mise:
+    repo: https://github.com/jdx/mise
+    version: 2026.6.14        # version manager (used for Java/JVM); calver, v-prefixed tag
+  pack:
+    repo: https://github.com/buildpacks/pack
+    version: 0.40.7
+  ripgrep:
+    repo: https://github.com/BurntSushi/ripgrep
+    version: 15.1.0
+  sd:
+    repo: https://github.com/chmln/sd
+    version: 1.1.0
+  terraform:
+    repo: https://github.com/hashicorp/terraform
+    version: 1.15.7
+  uv:
+    repo: https://github.com/astral-sh/uv
+    version: 0.11.24
+  yq:
+    repo: https://github.com/mikefarah/yq
+    version: v4.53.3        # yq tags are v-prefixed; template uses .version raw (like jq)
+  zoxide:
+    repo: https://github.com/ajeetdsouza/zoxide
+    version: 0.9.9

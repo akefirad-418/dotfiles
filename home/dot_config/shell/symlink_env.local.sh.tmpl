@@ -1,0 +1,2 @@
+{{- $src := joinPath .chezmoi.sourceDir ".." "private" "home" "config" "shell" "env.local.sh" -}}
+{{- if stat $src }}{{ $src }}{{ end -}}

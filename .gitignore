@@ -1,0 +1,10 @@
+.DS_Store
+**/.DS_Store
+
+test/.cache/
+
+# Private overlay: per-machine sibling clone, set up by install.sh. Not
+# tracked here so forkers can point at their own private repo (or none)
+# without conflicts on every upstream pull.
+/private/
+/private/clawtilla/private/

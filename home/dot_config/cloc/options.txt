@@ -1,0 +1,3 @@
+v      # verbose level 1
+vcs git
+exclude-list-file package-lock.json

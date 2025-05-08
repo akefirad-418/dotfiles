@@ -1,0 +1,8 @@
+.git
+**/.git
+.DS_Store
+**/.DS_Store
+test/.cache
+# Private overlay is a separate clone; the clawbot test doesn't need it (install.sh
+# skips it without a token) and it would bloat the build context.
+private/

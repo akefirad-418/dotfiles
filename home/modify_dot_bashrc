@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# chezmoi modify_ script. chezmoi pipes the current ~/.bashrc on stdin; whatever
+# this prints to stdout becomes the new content. Preserves existing content,
+# strips any prior managed block (current OR legacy marker, for clean migration),
+# and appends a fresh one. Real logic lives in the sourced files, not here.
+set -eufo pipefail
+
+MARKER_START='# >>> chezmoi-dotfiles (managed) >>>'
+MARKER_END='# <<< chezmoi-dotfiles (managed) <<<'
+LEGACY_START='# >>> dotfiles shared shell >>>'
+LEGACY_END='# <<< dotfiles shared shell <<<'
+
+# Echo stdin minus any prior managed block. Buffer blank lines so a trailing run
+# of blanks gets dropped (otherwise each apply adds a blank line before the marker
+# and idempotency breaks).
+awk -v s="$MARKER_START" -v e="$MARKER_END" -v ls="$LEGACY_START" -v le="$LEGACY_END" '
+  $0 == s || $0 == ls { skip = 1; pending = ""; next }
+  $0 == e || $0 == le { skip = 0; next }
+  skip    { next }
+  /^$/    { pending = pending "\n"; next }
+  { printf "%s%s\n", pending, $0; pending = "" }
+'
+
+cat <<EOF
+
+$MARKER_START
+# Managed by chezmoi. Do not edit! Changes will be overwritten!
+[ -r "\$HOME/.config/shell/env.sh"       ] && . "\$HOME/.config/shell/env.sh"
+[ -r "\$HOME/.config/shell/bashrc.sh"    ] && . "\$HOME/.config/shell/bashrc.sh"
+[ -r "\$HOME/.config/shell/aliases.sh"   ] && . "\$HOME/.config/shell/aliases.sh"
+[ -r "\$HOME/.config/shell/functions.sh" ] && . "\$HOME/.config/shell/functions.sh"
+$MARKER_END
+EOF

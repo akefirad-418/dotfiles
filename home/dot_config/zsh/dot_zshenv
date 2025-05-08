@@ -1,0 +1,7 @@
+export ZDOTDIR=$HOME/.config/zsh
+
+export OMZ_CUSTOM=$HOME/.config/ohmyzsh/custom
+export ZSH_CUSTOM=$OMZ_CUSTOM
+
+export AWS_DEFAULT_REGION=eu-central-1
+export CDK_DISABLE_CLI_TELEMETRY=true

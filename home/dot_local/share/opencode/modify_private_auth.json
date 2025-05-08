@@ -1,0 +1,53 @@
+#!/bin/sh
+# chezmoi modify_ script -> ~/.local/share/opencode/auth.json
+#
+# Seeds a FAKE Codex-subscription OAuth credential so OpenCode (with the
+# opencode-openai-codex-auth plugin) skips its device-login. The clawpatrol
+# gateway terminates TLS for chatgpt.com and overwrites Authorization: Bearer
+# with the REAL openai_codex_oauth credential at the wire, so this token never
+# authenticates upstream. It is not a secret.
+#
+# Gate: $CLAWBOT (a clawbot is behind the gateway, so it gets fake creds; from
+# scriptEnv) AND $INSTALL_OPENCODE (consumer gate — don't seed Codex creds for an
+# OpenCode that isn't installed). Not gated -> reproduce the existing file
+# byte-for-byte (and on an absent file, empty output makes chezmoi create nothing) so
+# a human box, or a box without OpenCode, is never touched.
+#
+# When gated: an absent/empty file is the first-build path -> emit the full seed
+# (no jq needed, which matters because the jq external isn't fetched yet at that
+# point in the apply). A non-empty file only happens on a re-apply, by which
+# time jq is installed -> merge so any other provider already present survives.
+set -eu
+
+# Buffer stdin to a file so passthrough is byte-exact (command substitution
+# would strip trailing newlines and make chezmoi rewrite the file every apply).
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
+cat > "$tmp"
+
+[ "${CLAWBOT:-0}" = "1" ] && [ "${INSTALL_OPENCODE:-0}" = "1" ] || { cat "$tmp"; exit 0; }
+
+JWT='eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImNsYXdwYXRyb2wifQ.eyJpc3MiOiJodHRwczovL2F1dGgub3BlbmFpLmNvbSIsImF1ZCI6ImNvZGV4IiwiZXhwIjo0MTAyNDQ0ODAwLCJjaGF0Z3B0X2FjY291bnRfaWQiOiJjbGF3cGF0cm9sIiwiZW1haWwiOiJjbGF3cGF0cm9sQGxvY2FsIiwiaHR0cHM6Ly9hcGkub3BlbmFpLmNvbS9hdXRoIjp7ImNoYXRncHRfYWNjb3VudF9pZCI6ImNsYXdwYXRyb2wiLCJjaGF0Z3B0X3BsYW5fdHlwZSI6InBybyJ9fQ.Y2xhd3BhdHJvbC1mYWtlLXNpZ25hdHVyZQ'
+
+if [ ! -s "$tmp" ]; then
+  cat <<JSON
+{
+  "openai": {
+    "type": "oauth",
+    "access": "$JWT",
+    "refresh": "clawpatrol-fake-refresh",
+    "expires": 4102444800000
+  }
+}
+JSON
+  exit 0
+fi
+
+# Existing content -> merge (preserve other providers). Prefer jq on PATH, then
+# the known external path; if neither exists, refuse to clobber.
+jq=jq
+command -v "$jq" >/dev/null 2>&1 || jq="$HOME/.local/bin/jq"
+if ! command -v "$jq" >/dev/null 2>&1; then cat "$tmp"; exit 0; fi
+"$jq" --arg jwt "$JWT" \
+  '.openai = {type:"oauth", access:$jwt, refresh:"clawpatrol-fake-refresh", expires:4102444800000}' \
+  < "$tmp"

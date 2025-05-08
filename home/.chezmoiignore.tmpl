@@ -1,0 +1,55 @@
+{{- /*
+  Files listed here are NOT applied to the target (the source still keeps them).
+  Two gates:
+    - per-role: on a clawbot ({{ "{{ if .clawbot }}" }}) drop the whole personal /
+      human-desktop layer, regardless of OS.
+    - per-OS: drop the other OS's scripts / externals / desktop files.
+*/ -}}
+
+{{- /* fish is parked for now on every machine. */ -}}
+.config/fish
+
+{{ if .clawbot -}}
+{{- /* ── clawbot: skip the personal / human-desktop layer ─────────────────── */ -}}
+.actrc
+.cdk.json
+.config/alacritty
+.config/cloc
+.config/ghostty
+.config/homebrew
+.config/karabiner
+.config/kubetail
+.config/ohmyzsh
+.config/shell/aliases.sh
+.config/wezterm
+.config/zsh/.fzf-tab.zsh
+.config/zsh/.fzf.zsh
+.config/zsh/.p10k.zsh
+.config/zsh/.zshrc
+.docker
+.finch
+.fxrc.js
+.gradle
+.hammerspoon
+.yarnrc.yml
+Library/**
+{{ end -}}
+
+{{ if ne .chezmoi.os "darwin" -}}
+{{- /* ── not macOS ─────────────────────────────────────────────────────────── */ -}}
+.chezmoiexternals/darwin.*
+.chezmoiscripts/darwin/**
+.config/homebrew
+.config/karabiner
+.hammerspoon
+Library/**
+{{ end -}}
+
+{{ if ne .chezmoi.os "linux" -}}
+{{- /* ── not Linux ─────────────────────────────────────────────────────────── */ -}}
+.chezmoiexternals/linux.*
+.chezmoiscripts/linux/**
+.hushlogin
+.local/bin/nvim
+.local/share/fonts
+{{ end -}}

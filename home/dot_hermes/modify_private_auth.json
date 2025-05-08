@@ -1,0 +1,73 @@
+#!/bin/sh
+# chezmoi modify_ script -> ~/.hermes/auth.json
+#
+# Seeds a FAKE Codex-subscription OAuth credential so Hermes skips its
+# device-login. The clawpatrol gateway terminates TLS for chatgpt.com and
+# overwrites Authorization: Bearer with the REAL openai_codex_oauth credential
+# at the wire, so this token never authenticates upstream. It is not a secret.
+# Hermes selects from credential_pool["openai-codex"], not just
+# providers["openai-codex"], so both are seeded.
+#
+# Gate: $CLAWBOT (a clawbot is behind the gateway, so it gets fake creds; from
+# scriptEnv) AND $INSTALL_HERMES (consumer gate — don't seed Codex creds for a Hermes
+# that isn't installed). Not gated -> reproduce the existing file byte-for-byte (and on
+# an absent file, empty output makes chezmoi create nothing) so a human box, or a box
+# without Hermes, is never touched.
+#
+# When gated: an absent/empty file is the first-build path -> emit the full seed
+# (no jq needed; the jq external isn't fetched yet at this point in the apply,
+# and ~/.hermes sorts before ~/.local/bin/jq). A non-empty file only happens on
+# a re-apply, by which time jq is installed -> merge so other providers survive.
+set -eu
+
+# Buffer stdin to a file so passthrough is byte-exact (command substitution
+# would strip trailing newlines and make chezmoi rewrite the file every apply).
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
+cat > "$tmp"
+
+[ "${CLAWBOT:-0}" = "1" ] && [ "${INSTALL_HERMES:-0}" = "1" ] || { cat "$tmp"; exit 0; }
+
+JWT='eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImNsYXdwYXRyb2wifQ.eyJpc3MiOiJodHRwczovL2F1dGgub3BlbmFpLmNvbSIsImF1ZCI6ImNvZGV4IiwiZXhwIjo0MTAyNDQ0ODAwLCJjaGF0Z3B0X2FjY291bnRfaWQiOiJjbGF3cGF0cm9sIiwiZW1haWwiOiJjbGF3cGF0cm9sQGxvY2FsIiwiaHR0cHM6Ly9hcGkub3BlbmFpLmNvbS9hdXRoIjp7ImNoYXRncHRfYWNjb3VudF9pZCI6ImNsYXdwYXRyb2wiLCJjaGF0Z3B0X3BsYW5fdHlwZSI6InBybyJ9fQ.Y2xhd3BhdHJvbC1mYWtlLXNpZ25hdHVyZQ'
+REFRESH='clawpatrol-fake-refresh'
+ISO='2026-01-01T00:00:00Z'
+
+if [ ! -s "$tmp" ]; then
+  cat <<JSON
+{
+  "providers": {
+    "openai-codex": {
+      "tokens": { "access_token": "$JWT", "refresh_token": "$REFRESH" },
+      "last_refresh": "$ISO",
+      "auth_mode": "chatgpt",
+      "label": "clawpatrol"
+    }
+  },
+  "credential_pool": {
+    "openai-codex": [
+      {
+        "source": "device_code",
+        "access_token": "$JWT",
+        "refresh_token": "$REFRESH",
+        "expires_at": "2100-01-01T00:00:00Z",
+        "last_refresh": "$ISO",
+        "label": "clawpatrol"
+      }
+    ]
+  },
+  "active_provider": "openai-codex"
+}
+JSON
+  exit 0
+fi
+
+# Existing content -> merge (preserve other providers). Prefer jq on PATH, then
+# the known external path; if neither exists, refuse to clobber.
+jq=jq
+command -v "$jq" >/dev/null 2>&1 || jq="$HOME/.local/bin/jq"
+if ! command -v "$jq" >/dev/null 2>&1; then cat "$tmp"; exit 0; fi
+"$jq" --arg jwt "$JWT" --arg refresh "$REFRESH" --arg iso "$ISO" '
+  .providers["openai-codex"] = {tokens:{access_token:$jwt, refresh_token:$refresh}, last_refresh:$iso, auth_mode:"chatgpt", label:"clawpatrol"}
+  | .credential_pool["openai-codex"] = [ {source:"device_code", access_token:$jwt, refresh_token:$refresh, expires_at:"2100-01-01T00:00:00Z", last_refresh:$iso, label:"clawpatrol"} ]
+  | .active_provider = (.active_provider // "openai-codex")
+' < "$tmp"
