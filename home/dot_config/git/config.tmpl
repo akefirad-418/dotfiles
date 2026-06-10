@@ -1,0 +1,15 @@
+[user]
+    name = {{ .git.name }}
+    email = {{ .git.email }}
+
+[core]
+    autocrlf = input
+
+[init]
+    defaultBranch = main
+
+[pull]
+    ff = only
+
+[push]
+    autoSetupRemote = true

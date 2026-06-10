@@ -1,0 +1,55 @@
+{{- /*
+  Tier 1: tool binaries pulled straight from GitHub releases into ~/.local/bin.
+  Versions come from .chezmoidata.yaml; OS/arch name fragments from
+  .chezmoi.yaml.tmpl. chezmoi auto-detects tar.gz/zip and extracts.
+
+  To add a tool: add it to .chezmoidata.yaml, add an archiveName* fragment to
+  .chezmoi.yaml.tmpl if the asset naming needs one, then add an entry here.
+
+  TODO: pin checksums. Each entry accepts `checksum.sha256: "<hex>"` (or
+  sha256 of a sums file via `checksum.sha256url`); without it a compromised or
+  truncated download is applied silently.
+*/ -}}
+
+.local/bin/rg:
+  type: archive-file
+  url: {{ .tools.ripgrep.repo }}/releases/download/{{ .tools.ripgrep.version }}/ripgrep-{{ .tools.ripgrep.version }}-{{ .archiveNameRipgrep }}.tar.gz
+  executable: true
+  path: ripgrep-{{ .tools.ripgrep.version }}-{{ .archiveNameRipgrep }}/rg
+
+.local/bin/fd:
+  type: archive-file
+  url: {{ .tools.fd.repo }}/releases/download/v{{ .tools.fd.version }}/fd-v{{ .tools.fd.version }}-{{ .archiveNameFd }}.tar.gz
+  executable: true
+  path: fd-v{{ .tools.fd.version }}-{{ .archiveNameFd }}/fd
+
+.local/bin/jq:
+  type: file
+  url: {{ .tools.jq.repo }}/releases/download/{{ .tools.jq.version }}/jq-{{ .archiveNameJq }}
+  executable: true
+
+.local/bin/gh:
+  type: archive-file
+  url: {{ .tools.gh.repo }}/releases/download/v{{ .tools.gh.version }}/gh_{{ .tools.gh.version }}_{{ .archiveNameGh }}.{{ if eq .chezmoi.os "darwin" }}zip{{ else }}tar.gz{{ end }}
+  executable: true
+  path: gh_{{ .tools.gh.version }}_{{ .archiveNameGh }}/bin/gh
+
+# uv ships uv + uvx in one archive; extract each into its own target.
+.local/bin/uv:
+  type: archive-file
+  url: {{ .tools.uv.repo }}/releases/download/{{ .tools.uv.version }}/uv-{{ .archiveNameUv }}.tar.gz
+  executable: true
+  path: uv-{{ .archiveNameUv }}/uv
+
+.local/bin/uvx:
+  type: archive-file
+  url: {{ .tools.uv.repo }}/releases/download/{{ .tools.uv.version }}/uv-{{ .archiveNameUv }}.tar.gz
+  executable: true
+  path: uv-{{ .archiveNameUv }}/uvx
+
+# fnm (Node version manager). Binary sits at the zip root.
+.local/bin/fnm:
+  type: archive-file
+  url: {{ .tools.fnm.repo }}/releases/download/v{{ .tools.fnm.version }}/fnm-{{ .archiveNameFnm }}.zip
+  executable: true
+  path: fnm

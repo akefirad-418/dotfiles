@@ -1,0 +1,7 @@
+# zsh environment — read for EVERY zsh invocation (login, interactive, scripts,
+# and `zsh -c`). This lives at the ZDOTDIR location; the configure script
+# symlinks ~/.zshenv here so a fresh machine (ZDOTDIR unset) reaches it via
+# ~/.zshenv too. Setting ZDOTDIR keeps the rest of zsh's files under here.
+export ZDOTDIR="$HOME/.config/zsh"
+
+[ -f "$HOME/.config/shell/env.sh" ] && . "$HOME/.config/shell/env.sh"

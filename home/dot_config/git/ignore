@@ -1,0 +1,5 @@
+# Global gitignore (~/.config/git/ignore). Machine/editor cruft only;
+# keep project-specific patterns in each repo's own .gitignore.
+.DS_Store
+*.swp
+*~

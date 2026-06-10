@@ -1,0 +1,29 @@
+{{- /* chezmoi config template. Produces ~/.config/chezmoi/chezmoi.yaml on `init`. */ -}}
+{{- $gitName  := promptStringOnce . "git.name"  "Git user.name"  "agent"             -}}
+{{- $gitEmail := promptStringOnce . "git.email" "Git user.email" "agent@localhost"   -}}
+{{- $rustArch := "x86_64" -}}
+{{- if eq .chezmoi.arch "arm64" }}{{ $rustArch = "aarch64" }}{{ end -}}
+data:
+  git:
+    name:  {{ $gitName  | quote }}
+    email: {{ $gitEmail | quote }}
+
+  # ── release-asset name fragments ──────────────────────────────────────────
+  # ripgrep: x86_64 ships musl, aarch64 ships gnu (no x86_64 gnu build).
+  archiveNameRipgrep: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else if eq .chezmoi.arch "amd64" }}unknown-linux-musl{{ else }}unknown-linux-gnu{{ end }}
+
+  # fd: both arches ship gnu.
+  archiveNameFd: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-gnu{{ end }}
+
+  # jq: direct binary named jq-<platform>.
+  archiveNameJq: {{ if eq .chezmoi.os "darwin" }}macos{{ else }}linux{{ end }}-{{ .chezmoi.arch }}
+
+  # gh: macOS asset is a .zip named macOS_<arch>; linux is .tar.gz named linux_<arch>.
+  archiveNameGh: {{ if eq .chezmoi.os "darwin" }}macOS{{ else }}linux{{ end }}_{{ .chezmoi.arch }}
+
+  # uv: rust target triple; both linux arches ship gnu.
+  archiveNameUv: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-gnu{{ end }}
+
+  # fnm: OS-named zips — macOS is a universal binary; linux x86_64 is "linux",
+  # linux arm64 is "arm64".
+  archiveNameFnm: {{ if eq .chezmoi.os "darwin" }}macos{{ else if eq .chezmoi.arch "arm64" }}arm64{{ else }}linux{{ end }}

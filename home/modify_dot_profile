@@ -1,0 +1,30 @@
+#!/bin/sh
+# modify_ script: chezmoi pipes the current ~/.profile on stdin; our stdout
+# becomes the new ~/.profile. Preserves existing content; ensures one managed
+# block that wires PATH for login shells and pulls in ~/.bashrc under bash.
+set -eu
+
+begin='# >>> chezmoi-dotfiles (managed) >>>'
+end='# <<< chezmoi-dotfiles (managed) <<<'
+
+# Re-emit existing content minus any previous block and trailing blank lines,
+# then one blank separator (only if there was content).
+awk -v b="$begin" -v e="$end" '
+  $0 == b { skip = 1; next }
+  $0 == e { skip = 0; next }
+  skip    { next }
+  { buf[++n] = $0 }
+  END {
+    while (n > 0 && buf[n] ~ /^[[:space:]]*$/) n--
+    for (i = 1; i <= n; i++) print buf[i]
+    if (n > 0) print ""
+  }
+'
+
+# Append a fresh managed block. \$HOME stays literal in the output.
+cat <<EOF
+$begin
+[ -f "\$HOME/.config/shell/env.sh" ] && . "\$HOME/.config/shell/env.sh"
+if [ -n "\$BASH_VERSION" ] && [ -f "\$HOME/.bashrc" ]; then . "\$HOME/.bashrc"; fi
+$end
+EOF

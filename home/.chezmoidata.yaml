@@ -1,0 +1,26 @@
+# Tool registry: repo + pinned version. Referenced by .chezmoiexternals/ as
+# {{ .tools.<name>.repo }} / {{ .tools.<name>.version }}. Bump a version here,
+# re-run `chezmoi apply`, and the new binary is fetched.
+#
+# Tier 1 of 3 (preferred): download a binary straight from GitHub releases.
+# Tier 2 (package manager) and tier 3 (vendor install script) live in
+# .chezmoiscripts/ for tools that don't ship a usable release binary.
+tools:
+  ripgrep:
+    repo: https://github.com/BurntSushi/ripgrep
+    version: 15.1.0            # tag has no `v` prefix
+  fd:
+    repo: https://github.com/sharkdp/fd
+    version: 10.4.2           # asset/path use the `v`-prefixed tag
+  jq:
+    repo: https://github.com/jqlang/jq
+    version: jq-1.8.1         # tag itself is `jq-<semver>`
+  gh:
+    repo: https://github.com/cli/cli
+    version: 2.94.0
+  uv:
+    repo: https://github.com/astral-sh/uv
+    version: 0.11.20          # tag has no `v` prefix; archive holds uv + uvx
+  fnm:
+    repo: https://github.com/Schniz/fnm
+    version: 1.39.0           # Node version manager; asset named by OS, not arch triple

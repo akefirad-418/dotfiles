@@ -1,0 +1,35 @@
+#!/bin/sh
+# modify_ script (NOT a plain file): chezmoi pipes the current ~/.bashrc on
+# stdin; our stdout becomes the new ~/.bashrc. We preserve every existing line
+# and ensure exactly one marker-delimited managed block at the end. The block
+# only sources our owned shell files — put real logic in those, not here.
+#
+# Idempotent + updatable: any previous block is stripped and trailing blank
+# lines trimmed before the fresh block is appended, so re-applying is stable
+# and editing the block below propagates on the next `chezmoi apply`.
+set -eu
+
+begin='# >>> chezmoi-dotfiles (managed) >>>'
+end='# <<< chezmoi-dotfiles (managed) <<<'
+
+# Re-emit existing content minus any previous block and trailing blank lines,
+# then one blank separator (only if there was content).
+awk -v b="$begin" -v e="$end" '
+  $0 == b { skip = 1; next }
+  $0 == e { skip = 0; next }
+  skip    { next }
+  { buf[++n] = $0 }
+  END {
+    while (n > 0 && buf[n] ~ /^[[:space:]]*$/) n--
+    for (i = 1; i <= n; i++) print buf[i]
+    if (n > 0) print ""
+  }
+'
+
+# Append a fresh managed block. \$HOME stays literal in the output.
+cat <<EOF
+$begin
+[ -f "\$HOME/.config/shell/env.sh" ]    && . "\$HOME/.config/shell/env.sh"
+[ -f "\$HOME/.config/shell/bashrc.sh" ] && . "\$HOME/.config/shell/bashrc.sh"
+$end
+EOF

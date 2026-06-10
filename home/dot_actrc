@@ -1,0 +1,3 @@
+--action-offline-mode
+--container-architecture=linux/amd64
+-P backend-linux-arm64-small=catthehacker/ubuntu:act-latest
