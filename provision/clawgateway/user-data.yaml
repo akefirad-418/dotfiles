@@ -1,0 +1,55 @@
+#cloud-config
+# clawgateway — cloud-init NoCloud seed (rpi-imager).
+#
+# Goes on the FAT boot partition as /boot/firmware/user-data. It runs at FIRST
+# boot only (once-per-instance) and fixes the identity/SSH findings AT THE SOURCE
+# (see docs/security/clawgateway-security-review.md: C1, H3, H5):
+#
+#   - key-only SSH (no password auth, locked account password)
+#   - NO password hash on the world-readable boot partition (H3)
+#   - password-REQUIRED sudo (replaces cloud-init's default NOPASSWD:ALL, C1)
+#   - runcmd hands off to harden.sh for the system-level hardening, then
+#     neutralises cloud-init so nothing is re-asserted on later boots.
+#
+# WHAT YOU MUST EDIT before flashing:
+#   1. ssh_authorized_keys below — put YOUR ed25519 public key there.
+#   2. Copy the whole provision/clawgateway/ dir to the boot partition as
+#      /boot/firmware/clawgateway/ (harden.sh + files/ travel with it).
+#   3. Supply network-config SEPARATELY (it carries the WiFi PSK — a secret;
+#      it must NOT live in this repo). See README.md.
+
+hostname: clawgateway
+manage_etc_hosts: true
+
+# No interactive/password SSH anywhere (C1). Key auth only.
+ssh_pwauth: false
+disable_root: true
+
+users:
+  - name: clawtilla
+    gecos: "clawbot gateway admin"
+    shell: /bin/bash
+    # Only the groups the gateway role actually needs (trimmed from the
+    # rpi-imager default; see review finding on over-broad group membership).
+    groups: [sudo, adm, netdev]
+    # No password login. lock_passwd keeps /etc/shadow locked; we deliberately
+    # ship NO `passwd:` hash so nothing crackable lands on the FAT partition (H3).
+    lock_passwd: true
+    # Password-REQUIRED sudo (C1): replaces the auto-generated NOPASSWD:ALL.
+    # A password must be set out-of-band before interactive sudo works — harden.sh
+    # expires the (locked) password so `sudo` prompts you to set one on first use.
+    sudo: "ALL=(ALL:ALL) ALL"
+    ssh_authorized_keys:
+      - "ssh-ed25519 REPLACE_WITH_YOUR_SSH_PUBLIC_KEY clawtilla@clawgateway"
+
+# Refresh + apply security updates on first boot (the image is patched only as of
+# its build date). Ongoing patching is set up by harden.sh (unattended-upgrades).
+package_update: true
+package_upgrade: true
+
+runcmd:
+  # Hand off to the idempotent hardening script shipped alongside this seed.
+  # Logs to the serial/cloud-init console and to /var/log/clawgateway-harden.log.
+  - [ bash, /boot/firmware/clawgateway/harden.sh ]
+
+final_message: "clawgateway cloud-init done after $UPTIME s — run 'sudo cat /var/log/clawgateway-harden.log' to review hardening."

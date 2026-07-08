@@ -1,0 +1,21 @@
+// clawgateway unattended-upgrades policy (finding H4).
+// Installed to /etc/apt/apt.conf.d/52clawgateway-unattended-upgrades; sorts
+// AFTER the package default 50unattended-upgrades so these keys win.
+
+Unattended-Upgrade::Origins-Pattern {
+        // Debian security + point releases.
+        "origin=Debian,codename=${distro_codename}-security,label=Debian-Security";
+        "origin=Debian,codename=${distro_codename}-updates";
+        "origin=Debian,codename=${distro_codename},label=Debian";
+        // Raspberry Pi OS archive (archive.raspberrypi.com). Verify the exact
+        // origin/label on the box with `apt-cache policy` if a release slips.
+        "origin=Raspberry Pi Foundation,codename=${distro_codename},label=Raspberry Pi Foundation";
+        "origin=Raspberry Pi Foundation,codename=${distro_codename}";
+};
+
+// Headless box: clean up and reboot in the small hours if a package needs it.
+Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+Unattended-Upgrade::Automatic-Reboot-Time "04:00";
