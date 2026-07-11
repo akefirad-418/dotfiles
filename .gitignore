@@ -18,3 +18,8 @@ test/.cache/
 
 # Python bytecode from skill scripts (e.g. skill-creator/scripts/).
 __pycache__/
+
+# Ignore local env files.
+**/*.env
+**/*.env.local
+**/*.env.*.local
