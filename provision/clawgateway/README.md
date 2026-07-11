@@ -65,14 +65,39 @@ ethernets:
    - your `network-config` → `/boot/firmware/network-config` (with the PSK)
    - **this whole directory** → `/boot/firmware/clawgateway/`
      (so `harden.sh` and `files/` are present for `runcmd`)
-3. Boot the Pi. cloud-init applies `user-data`, then `runcmd` runs
-   `harden.sh`, then cloud-init disables itself.
+3. Boot the Pi. This works **only because the flash is fresh**: rpi-imager bakes
+   a new instance-id into the image, so cloud-init treats the first boot as a new
+   instance and consumes `user-data`, then `runcmd` runs `harden.sh`, then
+   cloud-init disables itself. (On an existing box the id is unchanged and
+   `user-data` is skipped — see the next section.)
 4. Verify (from a host on the home LAN):
 
    ```sh
    ssh clawtilla@<gateway-ip> 'sudo cat /var/log/clawgateway-harden.log'
    ssh clawtilla@<gateway-ip> 'sudo nft list ruleset; sshd -T | grep -E "passwordauthentication|permitrootlogin"'
    ```
+
+## Hardening an ALREADY-provisioned box (no reflash)
+
+**Copying a new `user-data` onto a running box does nothing.** cloud-init's
+identity modules (`users_groups`, `set_passwords`, `ssh`, `runcmd`, …) run
+**once per instance**: the instance-id is baked into the kernel cmdline
+(`ds=nocloud;i=rpi-imager-…`) and consumed semaphores live under
+`/var/lib/cloud/instances/<id>/sem/`. On reboot the id is unchanged, so
+everything is skipped — `user-data` only takes effect on the first boot of a
+freshly flashed image. (Forcing it with `sudo cloud-init clean` re-runs *all*
+first-boot modules and is not worth the risk.)
+
+On a live box, do instead:
+
+1. Copy this directory over and run `sudo ./harden.sh` — everything it owns
+   (sshd, firewall, sysctl, updates, surface trim, cloud-init neutralised).
+2. Apply the two `user-data`-owned changes by hand:
+   - replace `/etc/sudoers.d/90-cloud-init-users` content with
+     `clawtilla ALL=(ALL:ALL) ALL` (via `visudo -f`) — removes `NOPASSWD:ALL`;
+   - set a strong password (`passwd`) — needed for sudo once `NOPASSWD` is gone —
+     and make sure your key is in `~/.ssh/authorized_keys` **before** anything
+     else, since `harden.sh` turns off password SSH.
 
 ## Re-running later
 
