@@ -15,3 +15,8 @@ test/.cache/
 # without conflicts on every upstream pull.
 /private/
 /private/clawtilla/private/
+
+# Ignore local env files.
+**/*.env
+**/*.env.local
+**/*.env.*.local

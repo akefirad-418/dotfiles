@@ -1,0 +1,79 @@
+#!/usr/sbin/nft -f
+# clawgateway host firewall — findings H1 (no INPUT filter), C2 (no LAN
+# segmentation), H2 (IPv6 exposure). See docs/security/clawgateway-security-review.md.
+#
+# COEXISTENCE: NetworkManager's "shared" mode owns a separate `table ip
+# nm-shared-eth0` (NAT masquerade + a permissive forward chain). We must NOT
+# touch it — so this file creates ONLY our own `table inet gateway_fw` and never
+# issues a global `flush ruleset` (that would wipe NM's NAT and cut off the
+# clawbots until NM rebuilt it). The delete-before-create guard makes reloads
+# idempotent without affecting other tables.
+#
+# Interfaces (see review §1):
+#   wlan0  = uplink to the home LAN (192.168.178.0/24) + public IPv6  [WAN side]
+#   eth0   = clawbot LAN, gateway is 10.42.0.1/24, dnsmasq DHCP+DNS   [LAN side]
+
+table inet gateway_fw
+delete table inet gateway_fw
+
+table inet gateway_fw {
+    # Private/bogon destinations a clawbot must never reach THROUGH the gateway
+    # (its own /24 is handled separately below). This is the C2 isolation set.
+    set private_v4 {
+        type ipv4_addr
+        flags interval
+        elements = {
+            10.0.0.0/8,
+            172.16.0.0/12,
+            192.168.0.0/16,
+            169.254.0.0/16,
+            100.64.0.0/10
+        }
+    }
+
+    chain input {
+        type filter hook input priority filter; policy drop;
+
+        iif "lo" accept
+        ct state established,related accept
+        ct state invalid drop
+
+        # ICMP is required — especially IPv6 ND/RA/NS for the uplink to work.
+        ip protocol icmp accept
+        ip6 nexthdr ipv6-icmp accept
+
+        # Management SSH: ONLY from the home LAN over the uplink. Clawbots on
+        # eth0 cannot reach sshd, and IPv6 SSH is dropped by policy (closes H2
+        # at the host regardless of the FRITZ!Box IPv6 firewall).
+        iifname "wlan0" ip saddr 192.168.178.0/24 tcp dport 22 accept
+
+        # DHCP + DNS for clawbots, LAN side only (dnsmasq binds 10.42.0.1).
+        iifname "eth0" udp dport { 53, 67 } accept
+        iifname "eth0" tcp dport 53 accept
+
+        # Everything else (avahi/mDNS 5353 on wlan0, etc.) hits policy drop (M4).
+    }
+
+    chain forward {
+        # priority -10 runs this BEFORE NetworkManager's permissive forward chain
+        # (priority 0), so our drop verdicts are terminal and win.
+        type filter hook forward priority -10; policy accept;
+
+        ct state established,related accept
+
+        # Clawbot LAN internal traffic is fine.
+        iifname "eth0" oifname "eth0" accept
+
+        # C2: a clawbot may reach the INTERNET but never any private network
+        # (home LAN, other RFC1918, CGNAT, link-local). Its own /24 already
+        # matched the rule above; anything else private is dropped here.
+        iifname "eth0" ip daddr @private_v4 drop
+
+        # Public-destined clawbot traffic falls through to `accept` and is then
+        # masqueraded by NM's nm-shared-eth0 NAT table.
+    }
+
+    chain output {
+        type filter hook output priority filter; policy accept;
+    }
+}

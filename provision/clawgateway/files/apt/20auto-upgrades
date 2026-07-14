@@ -1,0 +1,6 @@
+// clawgateway — enable periodic apt + unattended-upgrades (finding H4).
+// Installed to /etc/apt/apt.conf.d/20auto-upgrades by harden.sh.
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Download-Upgradeable-Packages "1";
+APT::Periodic::Unattended-Upgrade "1";
+APT::Periodic::AutocleanInterval "7";
