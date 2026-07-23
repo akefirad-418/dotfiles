@@ -70,7 +70,6 @@ casks=(
   gitbutler
   google-chrome
   hammerspoon
-  handy
   jetbrains-toolbox
   lapce
   meetingbar
