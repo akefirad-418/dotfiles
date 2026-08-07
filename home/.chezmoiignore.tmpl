@@ -84,3 +84,13 @@ Library/**
 .local/bin/nvim
 .local/share/fonts
 {{ end -}}
+
+{{ $sshOverlay := joinPath .chezmoi.sourceDir ".." "private" "home" "ssh" "config" -}}
+{{ if or .clawbot (not (stat $sshOverlay)) -}}
+{{- /* ~/.ssh/config is an overlay symlink (personal hosts + per-host keys →
+       private overlay, via private_dot_ssh/symlink_config.tmpl). Manage it ONLY on a
+       human box that has the overlay: ignore on clawbots (they don't use it) and
+       whenever the overlay source is absent, so an empty symlink render can never
+       DELETE a pre-existing hand-written ~/.ssh/config (same trap as .aws/config). */ -}}
+.ssh/config
+{{ end -}}
