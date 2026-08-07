@@ -27,7 +27,7 @@
 
 .local/bin/yq:
   type: file
-  url: {{ .tools.yq.repo }}/releases/download/{{ .tools.yq.version }}/yq_{{ .archiveNameYq }}
+  url: {{ .tools.yq.repo }}/releases/download/v{{ .tools.yq.version }}/yq_{{ .archiveNameYq }}
   executable: true
 
 .local/bin/gh:
