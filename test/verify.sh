@@ -19,7 +19,7 @@ present() { local n="$1"; shift; if [ "$#" -eq 0 ]; then have "$n" && ok "$n" ||
 absent() { local n="$1"; shift; if eval "$*" >/dev/null 2>&1; then no "$n" "present but should be gated off"; else ok "$n absent"; fi; }
 
 echo "==> tier-1 tools on PATH"
-for t in rg fd jq yq gh uv uvx mise aws; do present "$t"; done
+for t in rg fd ast-grep jq yq gh uv uvx mise aws; do present "$t"; done
 
 echo
 echo "==> optional tools (clawbot defaults BOTH off; explicit INSTALL_* env wins)"

@@ -6,7 +6,7 @@
 set -u
 
 bin_dir="$HOME/.local/bin"
-tools="rg fd jq gh uv uvx mise aws"
+tools="rg fd ast-grep jq gh uv uvx mise aws"
 
 echo "verify: checking ${bin_dir}"
 for t in $tools; do

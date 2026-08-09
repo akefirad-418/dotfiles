@@ -156,6 +156,7 @@ home/                              chezmoi source root (.chezmoiroot points here
   .chezmoiignore.tmpl              per-role + per-OS gating
   .chezmoiexternals/shared.yaml.tmpl   tier-1 downloads (minimal always; extras gated)
   .chezmoiscripts/
+    run_onchange_after_60-register-mcp-servers.sh  register MCP servers with Claude Code
     run_after_90-verify.sh                      post-apply check
     darwin/  00-install 01-packages 02-apps after_00-configure
     linux/   00-install 01-packages 02-apps 03-awscli 04-claude-code 05-opencode 06-hermes after_00-configure
