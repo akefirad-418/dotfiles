@@ -1,0 +1,3 @@
+interface:
+  display_name: "Documentation"
+  short_description: "Write in-code docs, folder READMEs and comments"
