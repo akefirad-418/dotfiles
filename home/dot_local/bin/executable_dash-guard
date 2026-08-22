@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+payload=$(cat)
+
+added=$(printf '%s' "$payload" | jq -r '.tool_input.content // .tool_input.new_string // ""')
+removed=$(printf '%s' "$payload" | jq -r '.tool_input.old_string // ""')
+
+dash_count() { grep -o -e '—' -e '–' | grep -c . || true; }
+
+new_dashes=$(printf '%s' "$added" | dash_count)
+old_dashes=$(printf '%s' "$removed" | dash_count)
+
+[ "$new_dashes" -le "$old_dashes" ] && exit 0
+
+file=$(printf '%s' "$payload" | jq -r '.tool_input.file_path // ""')
+
+jq -n --arg n "$((new_dashes - old_dashes))" --arg f "${file##*/}" '{
+  hookSpecificOutput: {
+    hookEventName: "PreToolUse",
+    permissionDecision: "deny",
+    permissionDecisionReason: ("dash-guard: this edit adds \($n) em/en dash(es) (— or –) to \($f). Per ~/AGENTS.md these are forbidden in any file. Rewrite with a comma, colon, parentheses, or two sentences, then retry.")
+  }
+}'

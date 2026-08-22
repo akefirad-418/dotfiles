@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+payload=$(cat)
+
+file=$(printf '%s' "$payload" | jq -r '.tool_input.file_path // ""')
+case "$file" in
+*.md | *.markdown | *.mdx | *.txt | *.rst | *.adoc) exit 0 ;;
+esac
+
+added=$(printf '%s' "$payload" | jq -r '.tool_input.content // .tool_input.new_string // ""')
+removed=$(printf '%s' "$payload" | jq -r '.tool_input.old_string // ""')
+
+comment_lines() {
+  grep -E '^[[:space:]]*(//|#|/\*|\*|--|<!--|\{\{-?[[:space:]]?/\*)' |
+    grep -vE '^[[:space:]]*#!' |
+    sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' |
+    sort || true
+}
+
+new_comments=$(printf '%s\n' "$added" | comment_lines)
+old_comments=$(printf '%s\n' "$removed" | comment_lines)
+
+count=$(comm -23 <(printf '%s\n' "$new_comments") <(printf '%s\n' "$old_comments") |
+  grep -c '[^[:space:]]' || true)
+
+[ "$count" -eq 0 ] && exit 0
+
+jq -n --arg n "$count" --arg f "$file" '{
+  systemMessage: ("comment-guard: \($n) comment line(s) added in " + ($f | split("/") | last)),
+  hookSpecificOutput: {
+    hookEventName: "PostToolUse",
+    additionalContext: ("comment-guard: this edit added \($n) comment line(s). Per ~/AGENTS.md a comment must record a non-obvious why, a gotcha, or an invariant; the surrounding density is NOT a reason to add one. Re-read what you just wrote and delete any comment that restates the code, explains the pattern, or notes the change.")
+  }
+}'

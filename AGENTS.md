@@ -6,7 +6,7 @@ Agent-facing configuration for this repo. `CLAUDE.md` is a symlink to this file.
 
 ### Issue tracker
 
-Issues are GitHub issues, but this is a multi-repo workspace — each submodule
+Issues are GitHub issues, but this is a multi-repo workspace: each submodule
 maps to its own GitHub repo, so pick the target repo before filing. External
 PRs are not triaged. See `docs/agents/issue-tracker.md`.
 

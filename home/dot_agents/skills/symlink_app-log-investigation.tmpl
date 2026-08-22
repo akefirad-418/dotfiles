@@ -1,0 +1,11 @@
+{{- /* Deliver the app-log-investigation skill onto the agent skill load path
+       (~/.agents/skills/, linked from ~/.claude/skills). This skill AND its references are PRIVATE, so the source
+       is the private overlay (not the public repo-root ai/) — same model as
+       opencode's AGENTS.md symlink. sourceDir is ~/.dotfiles/home,
+       so ".." is the repo root; the overlay is its sibling under private/. The stat
+       guard makes the link dangle silently when the overlay is absent, so the public
+       tree always stands alone. The same private dir feeds Hermes'
+       ~/.hermes/skills/devops/ symlink — one copy, no drift. Robot-only: gated to
+       clawbots in .chezmoiignore. */ -}}
+{{- $src := joinPath .chezmoi.sourceDir ".." "private" "home" "ai" "skills" "app-log-investigation" -}}
+{{- if stat $src }}{{ $src }}{{ end -}}
