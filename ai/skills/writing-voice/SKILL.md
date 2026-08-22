@@ -43,7 +43,9 @@ sparse source into a polished generality.
 After a whole draft exists, read it at speaking speed. Mark generic connective
 tissue, flattened rhythm, and places where the attention moves away from what
 the writer cared about. Remove unsupported polish rather than merely improving
-it. Keep a vivid turn when the source earns it.
+it. Keep a vivid turn when the source earns it. For the mechanical tells that
+survive that reading, machine vocabulary, puffery, formatting habits, and filler,
+scan against [references/ai-tells.md](references/ai-tells.md).
 
 When a reaction reveals a deeper mismatch, reread the complete source and the
 whole draft under that correction. Do not reduce “too solemn,” “too sanitized,”
