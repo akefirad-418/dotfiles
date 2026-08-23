@@ -111,6 +111,7 @@ data:
   # k9s releases use the GoReleaser "<Capitalized OS>_<arch>" pattern.
   archiveNameK9s: {{ if eq .chezmoi.os "darwin" }}Darwin{{ else }}Linux{{ end }}_{{ .chezmoi.arch }}
   archiveNamePack: {{ if eq .chezmoi.os "darwin" }}macos{{ else }}{{ .chezmoi.os }}{{ end }}{{ if eq .chezmoi.arch "arm64" }}-arm64{{ end }}
+  archiveNameCroc: {{ if eq .chezmoi.os "darwin" }}macOS{{ else }}Linux{{ end }}-{{ if eq .chezmoi.arch "arm64" }}ARM64{{ else }}64bit{{ end }}
   # mise: bare binary mise-v<ver>-<os>-<arch>; os macos|linux, arch x64|arm64.
   archiveNameMise: {{ if eq .chezmoi.os "darwin" }}macos{{ else }}linux{{ end }}-{{ if eq .chezmoi.arch "arm64" }}arm64{{ else }}x64{{ end }}
   # bun: <os>-<x64|aarch64> zips; binary at <name>/bun. os darwin|linux.
