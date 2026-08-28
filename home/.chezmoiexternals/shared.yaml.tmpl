@@ -20,6 +20,15 @@
   executable: true
   path: fd-v{{ .tools.fd.version }}-{{ .archiveNameFd }}/fd
 
+# ast-grep: structural (AST) search/rewrite — the agent-facing complement to rg.
+# The zip also carries a `sg` binary; deliberately not installed (clashes with the
+# setgid `sg(1)` on Linux).
+.local/bin/ast-grep:
+  type: archive-file
+  url: {{ .tools.astGrep.repo }}/releases/download/{{ .tools.astGrep.version }}/app-{{ .archiveNameAstGrep }}.zip
+  executable: true
+  path: ast-grep
+
 .local/bin/jq:
   type: file
   url: {{ .tools.jq.repo }}/releases/download/{{ .tools.jq.version }}/jq-{{ .archiveNameJq }}

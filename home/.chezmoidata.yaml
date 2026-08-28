@@ -2,6 +2,9 @@ tools:
   act:
     repo: https://github.com/nektos/act
     version: 0.2.89
+  astGrep:
+    repo: https://github.com/ast-grep/ast-grep
+    version: 0.45.1          # tags are NOT v-prefixed; assets are app-<rust-triple>.zip
   awsSso:
     repo: https://github.com/synfinatic/aws-sso-cli
     version: 2.3.2

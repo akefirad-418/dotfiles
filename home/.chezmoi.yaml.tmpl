@@ -90,9 +90,10 @@ data:
 
   # Rust target triples. The linux distribution flavor (gnu vs musl) is
   # chosen per project based on which the upstream actually ships:
-  # - bat, fd, uv: both arches ship `unknown-linux-gnu`.
+  # - ast-grep, bat, fd, uv: both arches ship `unknown-linux-gnu`.
   # - sd, zoxide: both arches ship `unknown-linux-musl`.
   # - ripgrep: arm64 ships `gnu`, x86_64 ships `musl` (no x86_64 gnu build).
+  archiveNameAstGrep: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-gnu{{ end }}
   archiveNameBat: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-gnu{{ end }}
   archiveNameFd: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-gnu{{ end }}
   archiveNameRipgrep: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else if eq .chezmoi.arch "amd64" }}unknown-linux-musl{{ else }}unknown-linux-gnu{{ end }}
