@@ -84,7 +84,6 @@ casks=(
   tigervnc
   visual-studio-code
   vlc
-  voiceink
   wezterm
   whatsapp
   zoom
