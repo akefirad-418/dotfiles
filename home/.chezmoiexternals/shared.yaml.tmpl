@@ -91,6 +91,12 @@
   executable: true
   path: glow_{{ .tools.glow.version }}_{{ .archiveNameGlow }}/glow
 
+.local/bin/croc:
+  type: archive-file
+  url: {{ .tools.croc.repo }}/releases/download/v{{ .tools.croc.version }}/croc_v{{ .tools.croc.version }}_{{ .archiveNameCroc }}.tar.gz
+  executable: true
+  path: croc
+
 {{ if not .clawbot -}}
 # ── PERSONAL ONLY ─────────────────────────────────────────────────────────────
 
