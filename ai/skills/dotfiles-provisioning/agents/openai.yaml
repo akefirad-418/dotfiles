@@ -1,0 +1,3 @@
+interface:
+  display_name: "Dotfiles Provisioning"
+  short_description: "Provision a tool, config or agent artifact through the chezmoi dotfiles repo"
