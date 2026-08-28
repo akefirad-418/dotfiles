@@ -183,6 +183,12 @@
   executable: true
   path: k9s
 
+.local/bin/pack:
+  type: archive-file
+  url: {{ .tools.pack.repo }}/releases/download/v{{ .tools.pack.version }}/pack-v{{ .tools.pack.version }}-{{ .archiveNamePack }}.tgz
+  executable: true
+  path: pack
+
 .local/bin/zoxide:
   type: archive-file
   url: {{ .tools.zoxide.repo }}/releases/download/v{{ .tools.zoxide.version }}/zoxide-{{ .tools.zoxide.version }}-{{ .archiveNameZoxide }}.tar.gz
