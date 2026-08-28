@@ -46,6 +46,7 @@ formulae=(
   mas
   mise
   nmap
+  ollama
   pnpm
   qemu
   shellcheck
