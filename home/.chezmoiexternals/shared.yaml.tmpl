@@ -144,6 +144,12 @@
   executable: true
   path: bun-{{ .archiveNameBun }}/bun
 
+.local/bin/codex:
+  type: archive-file
+  url: {{ .tools.codex.repo }}/releases/download/{{ .tools.codex.version }}/codex-{{ .archiveNameCodex }}.tar.gz
+  executable: true
+  path: codex-{{ .archiveNameCodex }}
+
 {{ if eq .chezmoi.os "linux" -}}
 .local/bin/btop:
   type: archive-file
