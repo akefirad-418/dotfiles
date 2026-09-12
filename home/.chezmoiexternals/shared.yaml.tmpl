@@ -144,6 +144,20 @@
   executable: true
   path: bun-{{ .archiveNameBun }}/bun
 
+.local/bin/codex:
+  type: archive-file
+  url: {{ .tools.codex.repo }}/releases/download/{{ .tools.codex.version }}/codex-{{ .archiveNameCodex }}.tar.gz
+  executable: true
+  path: codex-{{ .archiveNameCodex }}
+
+# codex resolves this sidecar as a sibling of its own executable, so it must stay
+# next to the binary above and on the same version, or every exec tool call fails.
+.local/bin/codex-code-mode-host:
+  type: archive-file
+  url: {{ .tools.codex.repo }}/releases/download/{{ .tools.codex.version }}/codex-code-mode-host-{{ .archiveNameCodex }}.tar.gz
+  executable: true
+  path: codex-code-mode-host-{{ .archiveNameCodex }}
+
 {{ if eq .chezmoi.os "linux" -}}
 .local/bin/btop:
   type: archive-file
