@@ -7,11 +7,11 @@
       "skillPath": "archify/SKILL.md",
       "computedHash": "585a672278374b0ae7b58ea254f0f78f7b01fe36075b096717d376f44a9f5b83"
     },
-    "to-spec": {
+    "wayfinder": {
       "source": "mattpocock/skills",
       "sourceType": "github",
-      "skillPath": "skills/engineering/to-spec/SKILL.md",
-      "computedHash": "3fa1a0695d4ea242fae9e569e4d22aa1788623197abb33bfadafae7315789bbf"
+      "skillPath": "skills/engineering/wayfinder/SKILL.md",
+      "computedHash": "fa790eb4255b13d24d7e33ff4891ccd3d621558cc0ab87ae226777538ea16a8f"
     }
   }
 }
