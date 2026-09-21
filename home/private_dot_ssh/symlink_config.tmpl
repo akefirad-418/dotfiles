@@ -1,0 +1,11 @@
+{{- /* Personal ~/.ssh/config as an overlay symlink: host aliases and per-host key
+       choices are personal (instance IDs, internal hostnames), so the content lives
+       in the private overlay, never the public repo. The private keys themselves are
+       never tracked — only this client config.
+
+       stat-guarded, so the public repo stands alone and the link dangles silently
+       when the overlay is absent. Gated in .chezmoiignore to be managed only where
+       the overlay exists, so an empty render can never DELETE a pre-existing
+       ~/.ssh/config. Same idiom as dot_aws/symlink_config.tmpl. */ -}}
+{{- $src := joinPath .chezmoi.sourceDir ".." "private" "home" "ssh" "config" -}}
+{{- if stat $src }}{{ $src }}{{ end -}}
