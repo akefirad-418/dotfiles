@@ -61,3 +61,6 @@ function install_zip() {
 # (existence-only; give a VERSION to enable upgrade-on-bump)
 install_zip "Scoot" "" "https://github.com/mjrusso/scoot/releases/download/v1.2/Scoot.app.zip"
 install_dmg "Anki"  "" "https://github.com/ankitects/anki/releases/download/25.07.5/anki-launcher-25.07.5-mac.dmg"
+
+orca_arch="$([[ "$(uname -m)" == arm64 ]] && echo arm64 || echo x64)"
+install_dmg "Orca" "1.4.206" "https://github.com/stablyai/orca/releases/download/v1.4.206/orca-macos-$orca_arch.dmg"
