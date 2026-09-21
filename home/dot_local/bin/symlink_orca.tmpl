@@ -1,0 +1,2 @@
+{{- $cli := joinPath .chezmoi.homeDir "Applications" "Orca.app" "Contents" "Resources" "bin" "orca" -}}
+{{- if stat $cli }}{{ $cli }}{{ end -}}
