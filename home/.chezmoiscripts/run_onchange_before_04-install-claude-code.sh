@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# Tier 3 (vendor installer): Claude Code CLI on Linux. No apt package — Anthropic's
-# official installer drops `claude` into ~/.local/bin (sudo-free). macOS installs it
-# via the `claude-code` Homebrew cask in darwin/01-install-packages. Install-if-
-# missing only: Claude Code self-updates, so nothing to pin.
+# Tier 3 (vendor installer): Claude Code CLI, both OSes. Anthropic's official
+# installer drops `claude` into ~/.local/bin (sudo-free). Install-if-missing
+# only: Claude Code self-updates, so nothing to pin.
 #
 # Skip with INSTALL_CLAUDE_CODE=0 (resolved once at init, delivered via scriptEnv;
 # see .chezmoi.yaml.tmpl). Flipping that flag on an existing box does NOT re-run this:

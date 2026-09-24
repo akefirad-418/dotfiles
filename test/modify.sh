@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Host-side behavioral tests for the FAKE-Codex-creds modify_ scripts
-# (home/dot_hermes + home/dot_local/share/opencode). Runs the ACTUAL scripts
+# (home/private_dot_hermes + home/dot_local/share/opencode). Runs the ACTUAL scripts
 # with controlled stdin + the gate env ($CLAWBOT ∧ the tool's $INSTALL_*) and
 # asserts the safety contract:
 # (~/.hermes/.env is seeded by the Hermes after-script, not a modify_, so it's
@@ -15,7 +15,7 @@ set -uo pipefail
 
 REPO_ROOT="$(cd -P -- "$(dirname -- "$0")/.." && pwd -P)"
 OC="$REPO_ROOT/home/dot_local/share/opencode/modify_private_auth.json"
-HM="$REPO_ROOT/home/dot_hermes/modify_private_auth.json"
+HM="$REPO_ROOT/home/private_dot_hermes/modify_private_auth.json"
 
 command -v jq >/dev/null 2>&1 || { echo "modify.sh: jq not found; skipping." >&2; exit 0; }
 

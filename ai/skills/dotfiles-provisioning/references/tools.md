@@ -66,7 +66,8 @@ clawbot needs, just don't gate it personal-only.
 An official installer that supports a sudo-free install into a user prefix, when
 neither a release binary nor a package fits. Models:
 `linux/run_onchange_before_03-install-awscli.sh` (AWS CLI v2 via `-i`/`-b` into
-`~/.local`) and `…04-install-claude-code.sh`. Conventions to copy:
+`~/.local`) and the shared `run_onchange_before_04-install-claude-code.sh`
+(both OSes, at the `.chezmoiscripts` root). Conventions to copy:
 
 - `#!/usr/bin/env bash`, `set -euo pipefail`, **no chezmoi templating** (stays a
   native `.sh` so it passes `shellcheck`; switches arrive via `scriptEnv` as env
