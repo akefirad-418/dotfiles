@@ -29,6 +29,7 @@ formulae=(
   btop
   cloc
   cloudflared
+  coreutils
   curl
   displayplacer
   dockutil
