@@ -97,9 +97,9 @@ itself to see the resolved values.
    (`bun bat fzf k9s helm …`) are gated `not .clawbot`; `btop`/`eza` are tier-1 on
    **Linux only** (macOS has no release binary for them, so it uses brew there).
 2. **Package manager** → per-OS scripts in [`home/.chezmoiscripts/`](home/.chezmoiscripts/):
-   macOS `brew bundle` (incl. the `claude-code` cask + `opencode` formula, all roles); personal
+   macOS `brew bundle` (incl. the `opencode` formula, all roles); personal
    Linux uses **apt** for distro tools (`git-delta httpie tree shellcheck`). No Linuxbrew.
-3. **Vendor installer** → AWS CLI v2 (both OSes); on **Linux**, Claude Code (`~/.local/bin`) and opencode (`~/.opencode/bin`), sudo-free, plus Hermes (opt-in, `INSTALL_HERMES=1`; macOS is a manual `.dmg`).
+3. **Vendor installer** → AWS CLI v2 (both OSes); Claude Code (`~/.local/bin`, both OSes); on **Linux**, opencode (`~/.opencode/bin`), sudo-free, plus Hermes (opt-in, `INSTALL_HERMES=1`; macOS is a manual `.dmg`).
 
 Language runtimes (Node, Java, …) are not provisioned — install and version them yourself (`mise` is on PATH for that).
 
@@ -156,10 +156,11 @@ home/                              chezmoi source root (.chezmoiroot points here
   .chezmoiignore.tmpl              per-role + per-OS gating
   .chezmoiexternals/shared.yaml.tmpl   tier-1 downloads (minimal always; extras gated)
   .chezmoiscripts/
+    run_onchange_before_04-install-claude-code.sh  Claude Code via official installer (both OSes)
     run_onchange_after_60-register-mcp-servers.sh  register MCP servers with Claude Code
     run_after_90-verify.sh                      post-apply check
     darwin/  00-install 01-packages 02-apps after_00-configure
-    linux/   00-install 01-packages 02-apps 03-awscli 04-claude-code 05-opencode 06-hermes after_00-configure
+    linux/   00-install 01-packages 02-apps 03-awscli 05-opencode 06-hermes after_00-configure
   modify_dot_bashrc, modify_dot_profile   managed block sourcing the files below
   dot_config/shell/   env.sh  bashrc.sh  aliases.sh  functions.sh  clawbot.env.tmpl
   dot_config/git/{config.tmpl,ignore}

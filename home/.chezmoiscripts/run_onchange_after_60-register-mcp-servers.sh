@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Registers MCP servers with Claude Code at USER scope, i.e. into ~/.claude.json —
 # which is Claude Code's own state file, not a chezmoi-managed target (same
-# arrangement as the devcontainer bootstrap in linux/04-install-claude-code.sh).
+# arrangement as the devcontainer bootstrap in 04-install-claude-code.sh).
 # Both OSes need this, so the script lives at the .chezmoiscripts root rather than
 # under darwin/ or linux/.
 #

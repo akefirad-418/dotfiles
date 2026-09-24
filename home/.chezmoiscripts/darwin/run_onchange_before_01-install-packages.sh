@@ -4,8 +4,8 @@
 #   personal (no clawbot)        -> formulae always; casks + mas only with a GUI
 #   GUI clawbot                  -> google-chrome + visual-studio-code
 #   headless clawbot             -> (optional tools only)
-# Claude Code (cask) + opencode (formula) install in every role unless their
-# INSTALL_* switch is 0 — CLIs a clawbot needs, so not GUI-gated. No --cleanup.
+# opencode (formula) installs in every role unless INSTALL_OPENCODE=0 (a CLI a
+# clawbot needs, so not GUI-gated). No --cleanup.
 set -euo pipefail
 
 # GUI is environmental — detect at runtime (not baked), re-evaluated each apply.
@@ -99,10 +99,9 @@ mas_apps=(
 # Build the Brewfile for this machine.
 brewfile() {
   local f c
-  # Optional tools (Claude Code, opencode) on every macOS role unless toggled off — a clawbot needs them, so
-  # they're NOT GUI-gated. Linux installs these via vendor scripts (linux/04, /05).
-  [ "${INSTALL_CLAUDE_CODE:-1}" != "0" ] && echo 'cask "claude-code"'
-  [ "${INSTALL_OPENCODE:-1}" != "0" ]    && echo 'brew "opencode"'
+  # Linux installs opencode via a vendor script (linux/05); Claude Code installs
+  # via the shared vendor script (before_04) on both OSes.
+  [ "${INSTALL_OPENCODE:-1}" != "0" ] && echo 'brew "opencode"'
   if [ -z "${CLAWBOT:-}" ]; then
     for f in "${formulae[@]}"; do echo "brew \"$f\""; done
     if [ "$GUI" = true ]; then
