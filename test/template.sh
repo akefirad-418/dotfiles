@@ -17,8 +17,11 @@ if ! command -v ruby >/dev/null 2>&1; then echo "template.sh: ruby not found; sk
 TMPD="$(mktemp -d)"; trap 'rm -rf "$TMPD"' EXIT
 
 # Prompt answers so promptStringOnce doesn't block; --source decouples from the
-# hardcoded sourceDir so this runs from any checkout path.
+# hardcoded sourceDir so this runs from any checkout path. EMPTY_CFG keeps rc
+# hermetic: otherwise the host's real chezmoi.yaml loads and its persisted
+# answers beat the env seeds.
 P=(-p git.name=test -p git.email=test@localhost -p p10k.repo=https://github.com/x/powerlevel10k.git --source "$REPO_ROOT")
+EMPTY_CFG="$TMPD/empty-config.yaml"; : > "$EMPTY_CFG"
 
 pass=0; fail=0
 assert_eq() { # NAME EXPECT ACTUAL
@@ -32,7 +35,7 @@ assert_false() { if [ "$2" -eq 0 ] 2>/dev/null; then printf '  ✅ %s\n' "$1"; p
 # Unique .yaml config per call. mktemp (not a shared counter) so it works even
 # though rc runs in a command-substitution subshell. chezmoi --config needs .yaml.
 rc() { local base out; base="$(mktemp "$TMPD/cfg.XXXXXX")"; out="$base.yaml"; mv "$base" "$out"; # shellcheck disable=SC2086
-  env $1 chezmoi execute-template --init "${P[@]}" < "$TMPL" > "$out"; echo "$out"; }
+  env $1 chezmoi --config "$EMPTY_CFG" execute-template --init "${P[@]}" < "$TMPL" > "$out"; echo "$out"; }
 # yget DOTTED.PATH FILE -> value (bools print true/false)
 yget() { ruby -ryaml -e 'p=ARGV[0].split("."); d=YAML.safe_load(File.read(ARGV[1])); p.each{|k| d=d[k]}; print d' "$1" "$2"; }
 # render TEMPLATE CONFIG -> rendered text on stdout
