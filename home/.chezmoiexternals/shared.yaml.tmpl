@@ -100,6 +100,11 @@
 {{ if not .clawbot -}}
 # ── PERSONAL ONLY ─────────────────────────────────────────────────────────────
 
+.local/bin/argocd:
+  type: file
+  url: {{ .tools.argocd.repo }}/releases/download/v{{ .tools.argocd.version }}/argocd-{{ .chezmoi.os }}-{{ .chezmoi.arch }}
+  executable: true
+
 # aws-sso-cli — for interactive human SSO login on personal machines. No Clawbots!
 .local/bin/aws-sso:
   type: file
