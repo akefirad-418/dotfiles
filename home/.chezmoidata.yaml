@@ -89,6 +89,9 @@ tools:
   uv:
     repo: https://github.com/astral-sh/uv
     version: 0.12.3
+  vitePlus:
+    repo: https://github.com/voidzero-dev/vite-plus
+    version: 1.2.0
   yq:
     repo: https://github.com/mikefarah/yq
     version: 4.53.3         # yq tags are v-prefixed; template uses .version raw (like jq)

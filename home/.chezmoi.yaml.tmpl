@@ -99,6 +99,7 @@ data:
   archiveNameFd: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-gnu{{ end }}
   archiveNameRipgrep: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else if eq .chezmoi.arch "amd64" }}unknown-linux-musl{{ else }}unknown-linux-gnu{{ end }}
   archiveNameSd: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-musl{{ end }}
+  archiveNameVitePlus: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-musl{{ end }}
   archiveNameUv: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-gnu{{ end }}
   # btop, eza: linux-only tier-1 (no macOS binary; macOS uses brew). btop ships musl, eza gnu.
   archiveNameBtop: {{ $rustArch }}-unknown-linux-musl

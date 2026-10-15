@@ -100,6 +100,12 @@
 {{ if not .clawbot -}}
 # ── PERSONAL ONLY ─────────────────────────────────────────────────────────────
 
+.local/bin/vp:
+  type: archive-file
+  url: {{ .tools.vitePlus.repo }}/releases/download/v{{ .tools.vitePlus.version }}/vp-{{ .archiveNameVitePlus }}.tar.gz
+  executable: true
+  path: vp
+
 # aws-sso-cli — for interactive human SSO login on personal machines. No Clawbots!
 .local/bin/aws-sso:
   type: file
