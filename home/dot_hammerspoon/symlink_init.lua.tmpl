@@ -1,0 +1,2 @@
+{{- $src := joinPath .chezmoi.sourceDir ".." "private" "home" "hammerspoon" "init.lua" -}}
+{{- if stat $src }}{{ $src }}{{ end -}}
