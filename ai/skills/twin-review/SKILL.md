@@ -75,13 +75,16 @@ and looks thorough while doing it.
 2. **Codex refuses a brief it is told to read from a file**, treating file content as data,
    not instructions. The brief has to be the prompt itself, which is why the launcher passes
    `"$(cat brief)"`.
-3. **A model the account does not offer loses the first turn silently.** Read the terminal
+3. **Codex stops at its folder-trust prompt in a repository it has not seen.** The trust applies
+   to the whole repository root and persists, so it is the user's to answer in the terminal;
+   the reviewer does nothing until then. Do not answer it for them.
+4. **A model the account does not offer loses the first turn silently.** Read the terminal
    after launch; if the model was rejected, set `TWIN_REVIEW_MODEL` and start again.
-4. **Addresses differ by surface.** The author reaches the reviewer by its terminal handle
+5. **Addresses differ by surface.** The author reaches the reviewer by its terminal handle
    (`--to term_...`); the reviewer reaches the author and you by `orca_session_id:<id>`.
-5. **The account cannot approve its own pull request**, so the end of the loop is a review of
+6. **The account cannot approve its own pull request**, so the end of the loop is a review of
    kind `COMMENT` whose body is "No further comments at <sha>."
-6. **GitHub creates no pull-request CI run while the pull request conflicts with its base.**
+7. **GitHub creates no pull-request CI run while the pull request conflicts with its base.**
    If CI never starts after a push, the author merges the base branch in; that is the author's
    job too.
 
