@@ -35,8 +35,9 @@ to minutes and keeps one owner for "is it green".
 
 ## Start it
 
-Preconditions: the author's work is on an open pull request, the author's chat is still alive
-in its Orca worktree, and `gh auth status` is good on this machine. Opening the pull request
+Preconditions: the author's work is on an open pull request, the author's chat is still alive,
+the repository is added to Orca (`orca repo add --path <checkout>`), and `gh auth status` is good
+on this machine. The author's path may be an Orca worktree or any checkout of the repository. Opening the pull request
 is the user's call unless they already asked for the loop.
 
 ```bash

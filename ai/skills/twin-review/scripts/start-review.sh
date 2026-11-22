@@ -22,9 +22,12 @@ print(text)
 PY
 }
 
-created=$(orca worktree create --name "gh-$pr-review" --parent-worktree "path:$author_path" \
-  --base-branch "origin/$branch" --pr "$pr" --json)
-path=$(printf '%s' "$created" | python3 -c "import json,sys; r=json.load(sys.stdin)['result']; print(r.get('path') or r['worktree']['path'])")
+# A child of the author's worktree when Orca manages it; otherwise a worktree of the same repo.
+create() { orca worktree create --name "gh-$pr-review" "$@" --base-branch "origin/$branch" --pr "$pr" --json || true; }
+worktree_path() { python3 -c "import json,sys; r=json.load(sys.stdin).get('result') or {}; print(r.get('path') or (r.get('worktree') or {}).get('path') or '')" 2>/dev/null || true; }
+path=$(create --parent-worktree "path:$author_path" 2>/dev/null | worktree_path)
+[ -n "$path" ] || path=$(create --repo "path:$(git -C "$author_path" rev-parse --show-toplevel)" --no-parent | worktree_path)
+[ -n "$path" ] || { echo "orca could not create the reviewer's worktree; is the repository added to Orca (orca repo add --path ...)?" >&2; exit 1; }
 mkdir -p "$path/.scratch"
 fill "$templates/reviewer-brief.md" > "$path/.scratch/review-brief.md"
 cat > "$path/.scratch/launch-reviewer.sh" <<SH
