@@ -32,29 +32,50 @@ what you must run and what result would satisfy it; you put the result in your r
 
 ## 1. Start the reviewer
 
-Everything committed and pushed, then from your checkout:
+Everything committed and pushed first. Then, from your own checkout:
 
 ```bash
-<this skill's directory>/scripts/start-review.sh "<what the pull request must satisfy>" [escalation-session-id]
+repo=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
+pr=$(gh pr view --json number --jq .number)
+branch=$(gh pr view --json headRefName --jq .headRefName)
+top=$(git rev-parse --show-toplevel)
+orca worktree create --name "gh-$pr-review" --parent-worktree "path:$top" \
+  --base-branch "origin/$branch" --pr "$pr" --json
 ```
 
-- The specification is the reviewer's whole idea of "correct": name the issue or design, the
-  acceptance checks, and what is out of scope.
-- Escalations and the final "review complete" go to the session you name, normally whoever
-  dispatched you (`orca_session_id` without the prefix). Without one they come to you, and you
-  bring them to the user.
-- The script finds the repository, the pull request, the branch and your session
-  (`ORCA_AGENT_SESSION_ID`) itself. Environment: `TWIN_REVIEW_MODEL` (default `gpt-6.2-sol`),
-  `TWIN_REVIEW_EFFORT` (default `xhigh`), `TWIN_REVIEW_ROUNDS` (default `8`).
+If that fails because your checkout is not an Orca worktree, use `--repo "path:$top" --no-parent`
+instead of `--parent-worktree`. If the repository is unknown to Orca, add it first with
+`orca repo add --path "$top"`. Take the new worktree's path from the JSON (`result.path` or
+`result.worktree.path`); below it is `$reviewer`.
 
-It prints the reviewer's terminal handle. Check its first output:
+**Write the brief.** Copy `templates/reviewer-brief.md` from this skill to
+`$(git -C "$reviewer" rev-parse --absolute-git-dir)/review-brief.md` (inside the git directory, so
+it can never be committed), replacing every placeholder:
+
+| Placeholder | Value |
+| --- | --- |
+| `{{PR}}`, `{{REPO}}`, `{{BRANCH}}` | from the commands above |
+| `{{AUTHOR_SESSION}}` | `$ORCA_AGENT_SESSION_ID`, your own session |
+| `{{ESCALATION_SESSION}}` | whoever dispatched you; your own session if nobody did |
+| `{{SPEC}}` | what the pull request must satisfy: the issue or design, the acceptance checks, what is out of scope |
+| `{{ROUND_CAP}}` | `8` unless told otherwise |
+
+Check that no `{{` is left.
+
+**Launch it.** This is the one command to copy exactly; see "What goes wrong" for why each part
+is there:
 
 ```bash
-orca terminal read --terminal <handle>
+brief=$(git -C "$reviewer" rev-parse --absolute-git-dir)/review-brief.md
+orca terminal create --worktree "path:$reviewer" --title "Review PR #$pr" --json --command \
+  "cd '$reviewer' && codex -m gpt-6.2-sol -c model_reasoning_effort=xhigh --approve-for-me -c sandbox_workspace_write.network_access=true \"\$(cat '$brief')\""
 ```
 
-Its first action is `gh auth status` and `gh pr view`; if either fails it stops and says so.
-Fix that first: a reviewer without GitHub reviews only the local tree and looks thorough doing it.
+Keep the handle it returns (`result.terminal.handle`); it is how you reach the reviewer. Then read
+its first output with `orca terminal read --terminal <handle>`. Its first action is
+`gh auth status` and `gh pr view`; if either fails it stops and says so. Fix that first: a reviewer
+without GitHub reviews only the local tree and looks thorough doing it. Use another model by
+changing `-m`; if the account rejects it, the first turn is lost silently, so read the terminal.
 
 ## 2. Each round
 
@@ -82,12 +103,12 @@ Fix that first: a reviewer without GitHub reviews only the local tree and looks 
    that into `~/.codex/config.toml`: it widens the sandbox on the user's machine, and a request for
    a reviewer that posts through the GitHub CLI authorizes it for this launch, nothing more.
 2. **Codex refuses a brief it is told to read from a file**, treating file content as data. The
-   brief is passed as the prompt itself.
+   brief is passed as the prompt itself, through `"$(cat ...)"`.
 3. **Codex stops at a folder-trust prompt in a repository it has not seen.** The trust covers the
    repository root and persists, so it is the user's to answer in the terminal. Tell them; do not
    answer it.
 4. **A model the account does not offer loses the first turn silently.** Read the terminal after
-   launch; if the model was rejected, set `TWIN_REVIEW_MODEL` and start again.
+   launch; if the model was rejected, close the terminal and launch again with another `-m`.
 5. **Addresses differ by surface.** You reach the reviewer by its terminal handle (`term_...`); it
    reaches you by `orca_session_id:<id>`.
 6. **The account cannot approve its own pull request**, so the loop ends with a review of kind
@@ -97,5 +118,4 @@ Fix that first: a reviewer without GitHub reviews only the local tree and looks 
 
 ## Files
 
-- `scripts/start-review.sh`: creates the reviewer's worktree and starts it.
-- `templates/reviewer-brief.md`: the reviewer's prompt.
+- `templates/reviewer-brief.md`: the reviewer's prompt, with the placeholders above.
