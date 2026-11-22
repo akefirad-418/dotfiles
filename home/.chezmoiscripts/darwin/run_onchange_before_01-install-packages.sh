@@ -29,6 +29,7 @@ formulae=(
   btop
   cloc
   cloudflared
+  coreutils
   curl
   displayplacer
   dockutil
@@ -60,6 +61,7 @@ formulae=(
 
 casks=(
   1password
+  1password-cli
   brave-browser
   cursor
   docker-desktop
@@ -79,7 +81,6 @@ casks=(
   raycast
   slack
   stolendata-mpv
-  t3-code
   telegram
   the-unarchiver
   tigervnc

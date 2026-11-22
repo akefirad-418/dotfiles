@@ -25,7 +25,7 @@ tools:
     version: 2026.7.3
   codex:
     repo: https://github.com/openai/codex
-    version: rust-v0.154.0
+    version: rust-v0.171.0
   croc:
     repo: https://github.com/schollz/croc
     version: 11.2.5
@@ -92,6 +92,9 @@ tools:
   uv:
     repo: https://github.com/astral-sh/uv
     version: 0.12.3
+  vitePlus:
+    repo: https://github.com/voidzero-dev/vite-plus
+    version: 1.2.0
   yq:
     repo: https://github.com/mikefarah/yq
     version: 4.53.3         # yq tags are v-prefixed; template uses .version raw (like jq)
