@@ -81,7 +81,6 @@ casks=(
   raycast
   slack
   stolendata-mpv
-  t3-code
   telegram
   the-unarchiver
   tigervnc
