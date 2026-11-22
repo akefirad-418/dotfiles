@@ -60,6 +60,7 @@ formulae=(
 
 casks=(
   1password
+  1password-cli
   brave-browser
   cursor
   docker-desktop
