@@ -60,9 +60,10 @@ set -euo pipefail
 # Pin github.com/NousResearch/hermes-agent to this commit. Bump to upgrade.
 HERMES_COMMIT="f57ff7aef1d3d447e159511f3a3e9ed8ae0c7298"  # main @ 2026-06-21
 # Codex/ChatGPT-served default model (bare slug, no "anthropic/"-style prefix).
-# Live-verified working set: gpt-5.5, gpt-5.4, gpt-5.4-mini, gpt-5.3-codex
-# (hermes_cli/codex_models.py:DEFAULT_CODEX_MODELS).
-HERMES_CODEX_MODEL="gpt-5.5"
+# Live-verified 2026-10-18: the ChatGPT account is served only gpt-5.6-sol,
+# gpt-5.6-terra and gpt-5.6-luna; gpt-5.5 and the older DEFAULT_CODEX_MODELS set
+# (hermes_cli/codex_models.py) now return HTTP 400 "model not supported".
+HERMES_CODEX_MODEL="gpt-5.6-sol"
 
 # The non-root installer drops the `hermes` launcher into ~/.local/bin (root/FHS
 # would use /usr/local/bin); ~/.hermes is only the data home + managed uv, never
