@@ -94,11 +94,14 @@ itself to see the resolved values.
 1. **Release binary** → `~/.local/bin`, declared in
    [`home/.chezmoiexternals/shared.yaml.tmpl`](home/.chezmoiexternals/shared.yaml.tmpl).
    Clawbot minimal set (always): `rg fd jq gh uv uvx mise`. Personal extras
-   (`bun bat fzf k9s helm …`) are gated `not .clawbot`; `btop`/`eza` are tier-1 on
-   **Linux only** (macOS has no release binary for them, so it uses brew there).
+   (`bun bat fzf k9s helm …`) are gated `not .clawbot`; `btop`/`eza`/`delta`/`shellcheck`
+   are tier-1 on **Linux only** and come from brew on macOS (`btop`/`eza` publish no
+   macOS binary, `delta` none for x86_64).
 2. **Package manager** → per-OS scripts in [`home/.chezmoiscripts/`](home/.chezmoiscripts/):
-   macOS `brew bundle` (incl. the `opencode` formula, all roles); personal
-   Linux uses **apt** for distro tools (`git-delta httpie tree shellcheck`). No Linuxbrew.
+   macOS `brew bundle` (incl. the `opencode` formula, all roles). Personal Linux has
+   no package list: on a box whose root disk is discarded while the home survives,
+   an apt-installed tool is gone after a restart and chezmoi does not reinstall it,
+   so personal Linux tools are tier 1. No Linuxbrew.
 3. **Vendor installer** → AWS CLI v2 (both OSes); Claude Code (`~/.local/bin`, both OSes); on **Linux**, opencode (`~/.opencode/bin`), sudo-free, plus Hermes (opt-in, `INSTALL_HERMES=1`; macOS is a manual `.dmg`).
 
 Language runtimes (Node, Java, …) are not provisioned — install and version them yourself (`mise` is on PATH for that).
@@ -160,7 +163,7 @@ home/                              chezmoi source root (.chezmoiroot points here
     run_onchange_after_60-register-mcp-servers.sh  register MCP servers with Claude Code
     run_after_90-verify.sh                      post-apply check
     darwin/  00-install 01-packages 02-apps after_00-configure
-    linux/   00-install 01-packages 02-apps 03-awscli 05-opencode 06-hermes after_00-configure
+    linux/   00-install 02-apps 03-awscli 05-opencode 06-hermes after_00-configure
   modify_dot_bashrc, modify_dot_profile   managed block sourcing the files below
   dot_config/shell/   env.sh  bashrc.sh  aliases.sh  functions.sh  clawbot.env.tmpl
   dot_config/git/{config.tmpl,ignore}
