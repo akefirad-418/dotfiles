@@ -1,34 +1,34 @@
 tools:
   act:
     repo: https://github.com/nektos/act
-    version: 0.2.89
+    version: 0.2.98
   astGrep:
     repo: https://github.com/ast-grep/ast-grep
-    version: 0.45.1          # tags are NOT v-prefixed; assets are app-<rust-triple>.zip
+    version: 0.51.3          # tags are NOT v-prefixed; assets are app-<rust-triple>.zip
   argocd:
     repo: https://github.com/argoproj/argo-cd
-    version: 3.5.3
+    version: 3.6.2
   awsSso:
     repo: https://github.com/synfinatic/aws-sso-cli
-    version: 2.3.2
+    version: 2.4.1
   bat:
     repo: https://github.com/sharkdp/bat
     version: 0.26.1
   btop:
     repo: https://github.com/aristocratos/btop
-    version: 1.4.7           # linux-only tier-1 (no macOS release binary)
+    version: 1.4.8           # linux-only tier-1 (no macOS release binary)
   bun:
     repo: https://github.com/oven-sh/bun
-    version: 1.3.14          # template adds bun-v prefix; zip holds <name>/bun
+    version: 1.4.5           # template adds bun-v prefix; zip holds <name>/bun
   cloudflared:
     repo: https://github.com/cloudflare/cloudflared
-    version: 2026.7.3
+    version: 2026.11.2
   codex:
     repo: https://github.com/openai/codex
     version: rust-v0.171.0
   croc:
     repo: https://github.com/schollz/croc
-    version: 11.2.5
+    version: 11.6.6
   delta:
     repo: https://github.com/dandavison/delta
     version: 0.22.0          # linux-only tier-1 (no x86_64 macOS release binary); tags are NOT v-prefixed
@@ -37,31 +37,31 @@ tools:
     version: 0.23.5          # linux-only tier-1 (no macOS release binary)
   fd:
     repo: https://github.com/sharkdp/fd
-    version: 10.4.2
+    version: 10.5.2
   fx:
     repo: https://github.com/antonmedv/fx
-    version: 39.2.0
+    version: 40.0.2
   fzf:
     repo: https://github.com/junegunn/fzf
-    version: 0.74.2
+    version: 0.75.0
   gdu:
     repo: https://github.com/dundee/gdu
-    version: 5.36.1
+    version: 5.39.0
   gh:
     repo: https://github.com/cli/cli
-    version: 2.97.0
+    version: 2.105.0
   glow:
     repo: https://github.com/charmbracelet/glow
-    version: 2.1.2
+    version: 3.0.0
   helm:
     repo: https://github.com/helm/helm
-    version: 4.2.3
+    version: 4.3.2
   jq:
     repo: https://github.com/jqlang/jq
     version: jq-1.8.2
   k6:
     repo: https://github.com/grafana/k6
-    version: 2.1.0
+    version: 2.4.0
   k9s:
     repo: https://github.com/derailed/k9s
     version: 0.51.0
@@ -73,19 +73,22 @@ tools:
     version: 1.34.8
   kubectl136:
     repo: https://dl.k8s.io
-    version: 1.36.1
+    version: 1.36.6
+  kubectl137:
+    repo: https://dl.k8s.io
+    version: 1.37.2
   kubetail:
     repo: https://github.com/kubetail-org/kubetail
-    version: cli/v0.18.0     # release tag includes the cli/ prefix; assets are kubetail-<os>-<arch>
+    version: cli/v0.18.1     # release tag includes the cli/ prefix; assets are kubetail-<os>-<arch>
   mise:
     repo: https://github.com/jdx/mise
-    version: 2026.8.2         # version manager (used for Java/JVM); calver, v-prefixed tag
+    version: 2026.11.12       # version manager (used for Java/JVM); calver, v-prefixed tag
   pack:
     repo: https://github.com/buildpacks/pack
-    version: 0.40.8
+    version: 0.40.11
   ripgrep:
     repo: https://github.com/BurntSushi/ripgrep
-    version: 15.2.0
+    version: 16.0.0
   sd:
     repo: https://github.com/chmln/sd
     version: 1.1.0
@@ -94,16 +97,16 @@ tools:
     version: 0.11.0          # linux-only tier-1 (macOS keeps brew)
   terraform:
     repo: https://github.com/hashicorp/terraform
-    version: 1.15.8
+    version: 1.17.2
   uv:
     repo: https://github.com/astral-sh/uv
-    version: 0.12.3
+    version: 0.13.9
   vitePlus:
     repo: https://github.com/voidzero-dev/vite-plus
-    version: 1.2.0
+    version: 1.7.0
   yq:
     repo: https://github.com/mikefarah/yq
-    version: 4.53.3         # yq tags are v-prefixed; template uses .version raw (like jq)
+    version: 4.54.3         # yq tags are v-prefixed; template uses .version raw (like jq)
   zoxide:
     repo: https://github.com/ajeetdsouza/zoxide
     version: 0.10.0
