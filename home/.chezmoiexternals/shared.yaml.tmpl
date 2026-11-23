@@ -181,6 +181,18 @@
   url: {{ .tools.eza.repo }}/releases/download/v{{ .tools.eza.version }}/eza_{{ .archiveNameEza }}.tar.gz
   executable: true
   path: ./eza
+
+.local/bin/delta:
+  type: archive-file
+  url: {{ .tools.delta.repo }}/releases/download/{{ .tools.delta.version }}/delta-{{ .tools.delta.version }}-{{ .archiveNameDelta }}.tar.gz
+  executable: true
+  path: delta-{{ .tools.delta.version }}-{{ .archiveNameDelta }}/delta
+
+.local/bin/shellcheck:
+  type: archive-file
+  url: {{ .tools.shellcheck.repo }}/releases/download/v{{ .tools.shellcheck.version }}/shellcheck-v{{ .tools.shellcheck.version }}.{{ .archiveNameShellcheck }}.tar.gz
+  executable: true
+  path: shellcheck-v{{ .tools.shellcheck.version }}/shellcheck
 {{ end }}
 .local/bin/bat:
   type: archive-file

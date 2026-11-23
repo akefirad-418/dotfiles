@@ -29,6 +29,9 @@ tools:
   croc:
     repo: https://github.com/schollz/croc
     version: 11.2.5
+  delta:
+    repo: https://github.com/dandavison/delta
+    version: 0.22.0          # linux-only tier-1 (no x86_64 macOS release binary); tags are NOT v-prefixed
   eza:
     repo: https://github.com/eza-community/eza
     version: 0.23.5          # linux-only tier-1 (no macOS release binary)
@@ -86,6 +89,9 @@ tools:
   sd:
     repo: https://github.com/chmln/sd
     version: 1.1.0
+  shellcheck:
+    repo: https://github.com/koalaman/shellcheck
+    version: 0.11.0          # linux-only tier-1 (macOS keeps brew)
   terraform:
     repo: https://github.com/hashicorp/terraform
     version: 1.15.8

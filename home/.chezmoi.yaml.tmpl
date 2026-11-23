@@ -101,9 +101,11 @@ data:
   archiveNameSd: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-musl{{ end }}
   archiveNameVitePlus: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-musl{{ end }}
   archiveNameUv: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-gnu{{ end }}
-  # btop, eza: linux-only tier-1 (no macOS binary; macOS uses brew). btop ships musl, eza gnu.
+  # btop, eza, delta, shellcheck: linux-only tier-1 (macOS uses brew). btop ships musl, eza and delta gnu.
   archiveNameBtop: {{ $rustArch }}-unknown-linux-musl
   archiveNameEza: {{ $rustArch }}-unknown-linux-gnu
+  archiveNameDelta: {{ $rustArch }}-unknown-linux-gnu
+  archiveNameShellcheck: linux.{{ $rustArch }}
   archiveNameZoxide: {{ $rustArch }}-{{ if eq .chezmoi.os "darwin" }}apple-darwin{{ else }}unknown-linux-musl{{ end }}
   archiveNameGh: {{ if eq .chezmoi.os "darwin" }}macOS{{ else }}{{ .chezmoi.os }}{{ end }}_{{ .chezmoi.arch }}
   archiveNameJq: {{ if eq .chezmoi.os "darwin" }}macos{{ else }}linux{{ end }}-{{ .chezmoi.arch }}
