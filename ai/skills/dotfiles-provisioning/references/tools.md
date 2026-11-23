@@ -51,15 +51,11 @@ A distro/brew package, via per-OS scripts in `home/.chezmoiscripts/`:
 - **macOS:** `darwin/run_onchange_before_01-install-packages.sh` builds a Brewfile
   (formulae always; casks + mas only with a GUI) and runs `brew bundle`. Add your
   formula/cask to the right array.
-- **Linux:** `linux/run_onchange_before_01-install-packages.sh` uses `apt` — but
-  it is **personal-only**: it exits early when `$CLAWBOT` is set. Base prerequisites
-  every box needs go in `linux/run_onchange_before_00-install.sh` instead.
-
-**Note on the existing Linux apt script:** `01-install-packages.sh` is gated
-personal-only (it exits when `$CLAWBOT` is set) simply because the tools listed in
-it are personal — that's a gating choice for those specific tools, *not* a
-limitation. A clawbot has root and can use `apt` fine. If you add a tier-2 tool a
-clawbot needs, just don't gate it personal-only.
+- **Linux:** `apt`, for base prerequisites every box needs, in
+  `linux/run_onchange_before_00-install.sh`. There is no personal apt list: on a
+  box whose root disk is discarded while the home survives, an apt-installed tool
+  is gone after a restart and chezmoi does not reinstall it, so personal Linux
+  tools go in tier 1.
 
 ## Tier 3 — vendor installer
 
@@ -101,7 +97,7 @@ $sudo apt-get install -y --no-install-recommends "${pkgs[@]}"
 Then run every privileged command through `$sudo` (empty when already root). Pick
 the no-privilege branch by how essential the tool is:
 - **Base prerequisite the box can't work without** → hard-fail (`exit 1`), like
-  `00-install.sh` / `01-install-packages.sh`.
+  `00-install.sh`.
 - **Optional / nice-to-have** → warn and skip (`exit 0`), like `02-install-apps.sh`
   and the hermes ffmpeg step (`sudo="-"` sentinel → skip that piece, continue).
 
