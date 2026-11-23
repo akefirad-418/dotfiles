@@ -74,6 +74,9 @@ tools:
   kubectl136:
     repo: https://dl.k8s.io
     version: 1.36.6
+  kubectl137:
+    repo: https://dl.k8s.io
+    version: 1.37.2
   kubetail:
     repo: https://github.com/kubetail-org/kubetail
     version: cli/v0.18.1     # release tag includes the cli/ prefix; assets are kubetail-<os>-<arch>
