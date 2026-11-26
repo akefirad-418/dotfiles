@@ -134,8 +134,10 @@ clawtilla is the *containment* half. They meet at **credential injection**:
 ## Private overlay (optional)
 
 Private dotfiles live in a separate repo cloned into `private/` (gitignored,
-*not* a submodule). `install.sh` clones it first: on a TTY it prompts for a token
-(hidden); non-interactively it runs only if `PRIVATE_GH_TOKEN` is set. The URL is
+*not* a submodule). `install.sh` clones it first, with git's own credentials when
+they reach it (e.g. after `gh auth setup-git`), else with a token: on a TTY it
+prompts for one (hidden); non-interactively it runs only if `PRIVATE_GH_TOKEN` is
+set. The URL is
 derived from this repo's `origin` (repo name prefixed with a dot). The token is
 used only in-process — never written to disk, the clone's config, the URL, shell
 history, or `ps`.

@@ -7,7 +7,8 @@
 # Idempotent and non-interactive-safe: on a TTY it prompts for git identity, whether
 # to clone the private overlay, the Powerlevel10k repo, and which optional tools to install;
 # in CI/containers it takes derived defaults (honoring GIT_AUTHOR_NAME / GIT_AUTHOR_EMAIL
-# and the INSTALL_* env), skipping the private clone unless PRIVATE_GH_TOKEN is set — or
+# and the INSTALL_* env), skipping the private clone unless git's own credentials reach it,
+# PRIVATE_GH_TOKEN is set, or
 # it's a clawbot ($CLAWBOT), where the clawtilla gateway injects the real credential and
 # the clone proceeds with a placeholder token.
 #
@@ -39,6 +40,7 @@ ensure_chezmoi() {
 # Clone the private overlay into ./private (gitignored), a per-machine sibling clone so
 # forkers can point at their own private repo (or none). The URL is derived from THIS
 # repo's origin: same host/owner, repo name with a leading dot (dotfiles -> .dotfiles).
+# Without PRIVATE_GH_TOKEN it first tries git's own credentials (e.g. `gh auth setup-git`).
 # The token is used only in-process — never written to disk, the clone's .git/config,
 # the URL, shell history, or visible in `ps` (the helper holds a literal $TOKEN; git
 # expands it at runtime). Skipped when there's no origin, or it's already cloned, or
@@ -63,6 +65,11 @@ clone_private() {
 
   dest="$script_dir/private"
   [ -e "$dest/.git" ] && { echo "private: already present at $dest." >&2; return 0; }
+
+  if [ -z "${PRIVATE_GH_TOKEN:-}" ] && GIT_TERMINAL_PROMPT=0 git clone -q "$priv_url" "$dest" 2>/dev/null; then
+    echo "private: cloned with git's own credentials." >&2
+    return 0
+  fi
 
   # Token from $PRIVATE_GH_TOKEN, else prompt on a TTY (echo off).
   token="${PRIVATE_GH_TOKEN:-}"
