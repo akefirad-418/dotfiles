@@ -4,3 +4,5 @@ font-family = 'Menlo for Powerline'
 font-size = 12.5
 
 background-opacity = 0.9
+
+shell-integration-features = ssh-terminfo,ssh-env
