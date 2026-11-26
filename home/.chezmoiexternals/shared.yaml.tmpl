@@ -155,19 +155,13 @@
   executable: true
   path: bun-{{ .archiveNameBun }}/bun
 
-.local/bin/codex:
-  type: archive-file
-  url: {{ .tools.codex.repo }}/releases/download/{{ .tools.codex.version }}/codex-{{ .archiveNameCodex }}.tar.gz
-  executable: true
-  path: codex-{{ .archiveNameCodex }}
-
-# codex resolves this sidecar as a sibling of its own executable, so it must stay
-# next to the binary above and on the same version, or every exec tool call fails.
-.local/bin/codex-code-mode-host:
-  type: archive-file
-  url: {{ .tools.codex.repo }}/releases/download/{{ .tools.codex.version }}/codex-code-mode-host-{{ .archiveNameCodex }}.tar.gz
-  executable: true
-  path: codex-code-mode-host-{{ .archiveNameCodex }}
+# The whole package, not loose binaries: codex finds its sidecars, bwrap and bundled rg
+# relative to its real path, and on Linux its background server refuses to start without
+# them. ~/.local/bin/codex is a symlink into bin/.
+.local/share/codex:
+  type: archive
+  url: {{ .tools.codex.repo }}/releases/download/{{ .tools.codex.version }}/codex-package-{{ .archiveNameCodex }}.tar.gz
+  exact: true
 
 {{ if eq .chezmoi.os "linux" -}}
 .local/bin/btop:
