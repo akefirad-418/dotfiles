@@ -68,7 +68,7 @@ is there:
 ```bash
 brief=$(git -C "$reviewer" rev-parse --absolute-git-dir)/review-brief.md
 orca terminal create --worktree "path:$reviewer" --title "Review PR #$pr" --json --command \
-  "cd '$reviewer' && codex -m gpt-6.2-sol -c model_reasoning_effort=xhigh --approve-for-me -c sandbox_workspace_write.network_access=true \"\$(cat '$brief')\""
+  "cd '$reviewer' && codex -m gpt-6.2-sol -c model_reasoning_effort=high --approve-for-me -c sandbox_workspace_write.network_access=true \"\$(cat '$brief')\""
 ```
 
 Keep the handle it returns (`result.terminal.handle`); it is how you reach the reviewer. Then read
